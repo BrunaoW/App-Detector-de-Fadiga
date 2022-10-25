@@ -1,4 +1,4 @@
-package com.wilsoncarolinomalachias.detectordefadiga.ui.theme
+package com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
