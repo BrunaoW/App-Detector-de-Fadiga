@@ -1,33 +1,35 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.camera.core.ImageCapture
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.BottomNav
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport.CourseReportScreen
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.CoursesHistoryScreen
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.FatigueDetectionScreen
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.startcourse.StartCourseScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class MainActivity : ComponentActivity() {
+    private var imageCapture: ImageCapture? = null
+
+    private var videoCapture: VideoCapture<Recorder>? = null
+    private var recording: Recording? = null
+
+    private lateinit var cameraExecutor: ExecutorService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -47,5 +49,33 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        if (checkCameraPermission()) {
+            startCamera()
+        }
+
+        cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun startCamera() {
+//        TODO("Not yet implemented")
+    }
+
+    private fun checkCameraPermission(): Boolean {
+        if (ContextCompat.checkSelfPermission(baseContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.CAMERA),
+            REQUEST_CODE_PERMISSIONS
+        )
+
+        return false
+    }
+
+    companion object {
+        private const val REQUEST_CODE_PERMISSIONS = 10
     }
 }

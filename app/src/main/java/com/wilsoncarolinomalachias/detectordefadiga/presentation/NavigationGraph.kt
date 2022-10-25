@@ -18,7 +18,7 @@ fun NavigationGraph(
         startDestination = Screen.StartCourseScreen.route
     ) {
         composable(route = Screen.StartCourseScreen.route) {
-            StartCourseScreen()
+            StartCourseScreen(navController)
         }
 
         composable(route = Screen.FatigueDetection.route) {

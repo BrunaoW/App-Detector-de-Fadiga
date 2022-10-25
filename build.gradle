@@ -2,6 +2,7 @@ buildscript {
     ext {
         compose_version = '1.1.1'
         mlkitVersion = '16.1.5'
+        camerax_version = "1.1.0"
     }
     repositories {
         google()

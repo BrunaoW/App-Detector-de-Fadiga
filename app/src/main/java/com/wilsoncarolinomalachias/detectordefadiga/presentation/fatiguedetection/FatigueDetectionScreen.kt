@@ -1,9 +1,11 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 
 @Composable
 fun FatigueDetectionScreen() {
-
+    Column() {
+        
+    }
 }
