@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.BottomNav
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport.CourseReportScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.CoursesHistoryScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.FatigueDetectionScreen
@@ -36,29 +38,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val navController = rememberNavController()
-                    NavHost(
-                        navController = navController,
-                        startDestination = Screen.StartCourseScreen.route
+                    
+                    Scaffold(
+                        bottomBar = { BottomNav(navController = navController)}
                     ) {
-                        composable(route = Screen.StartCourseScreen.route) {
-                            StartCourseScreen()
-                        }
-
-                        composable(route = Screen.FatigueDetection.route) {
-                            FatigueDetectionScreen()
-                        }
-
-                        composable(route = Screen.CourseReport.route) {
-                            CourseReportScreen()
-                        }
-
-                        composable(route = Screen.CoursesHistory.route) {
-                            CoursesHistoryScreen()
-                        }
-
-                        composable(route = Screen.UserProfile.route) {
-                            CourseReportScreen()
-                        }
+                        NavigationGraph(navController = navController)
                     }
                 }
             }
