@@ -1,8 +1,7 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection
 
 import android.content.Context
-import android.graphics.Point
-import android.graphics.Rect
+import android.graphics.PointF
 import android.util.Log
 import android.util.Size
 import android.view.LayoutInflater
@@ -26,15 +25,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.face.Face
-import com.google.mlkit.vision.face.FaceContour
-import com.google.mlkit.vision.face.FaceDetection
-import com.google.mlkit.vision.face.FaceDetectorOptions
-import com.google.mlkit.vision.face.FaceLandmark
+import com.google.mlkit.vision.face.*
 import com.wilsoncarolinomalachias.detectordefadiga.R
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.FaceBoundsOverlay
 import kotlinx.coroutines.launch
+import java.lang.String
+import java.util.*
 import java.util.concurrent.Executor
+import kotlin.Exception
+import kotlin.also
+import kotlin.apply
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -58,6 +58,7 @@ fun FatigueDetectionScreen(
     // Real-time contour detection
     val realTimeOpts = FaceDetectorOptions.Builder()
         .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
+        .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
         .build()
 
     val detector = FaceDetection.getClient(realTimeOpts)
@@ -91,7 +92,7 @@ fun FatigueDetectionScreen(
                     }
 
                 val imageAnalysis = ImageAnalysis.Builder()
-                    .setTargetResolution(Size(previewView.width, previewView.height))
+                    .setTargetResolution(Size(rootView.width, rootView.height))
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
 
@@ -110,43 +111,17 @@ fun FatigueDetectionScreen(
                             .process(processImage)
                             .addOnSuccessListener { faces ->
                                 face = faces.firstOrNull()
-                                face?.let { faceBoundsOverlay.drawFaceBounds(it.allLandmarks) }
+                                val allPoints = face?.allContours?.fold(listOf<PointF>()) { contours, contour ->
+                                    contours + contour.points
+                                } ?: listOf()
 
-//                                for (face in faces) {
-//                                    faceBounds = face.boundingBox
-//                                    faceRotationY = face.headEulerAngleY // Head is rotated to the right rotY degrees
-//                                    faceRotationZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
-//
-//                                    // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
-//                                    // nose available):
-//                                    val leftEar = face.getLandmark(FaceLandmark.LEFT_EAR)
-//                                    leftEar?.let {
-//                                        val leftEarPos = leftEar.position
-//                                    }
-//
-//                                    // If contour detection was enabled:
-//                                    val leftEyeContour = face.getContour(FaceContour.LEFT_EYE)?.points
-//                                    val upperLipBottomContour = face.getContour(FaceContour.UPPER_LIP_BOTTOM)?.points
-//
-//                                    // If classification was enabled:
-//                                    if (face.smilingProbability != null) {
-//                                        val smileProb = face.smilingProbability
-//                                    }
-//                                    if (face.rightEyeOpenProbability != null) {
-//                                        val rightEyeOpenProb = face.rightEyeOpenProbability
-//                                    }
-//
-//                                    // If face tracking was enabled:
-//                                    if (face.trackingId != null) {
-//                                        val id = face.trackingId
-//                                    }
-//                                }
+                                faceBoundsOverlay.drawFaceBounds(allPoints)
+
                                 imageProxy.close()
                             }
                             .addOnFailureListener {
                                 imageProxy.close()
                             }
-
                     }
                 }
 
@@ -156,7 +131,7 @@ fun FatigueDetectionScreen(
                         // Must unbind the use-cases before rebinding them.
                         cameraProvider.unbindAll()
                         cameraProvider.bindToLifecycle(
-                            lifecycleOwner, cameraSelector, previewUseCase
+                            lifecycleOwner, cameraSelector, imageAnalysis, previewUseCase
                         )
                     } catch (ex: Exception) {
                         Log.e("CameraPreview", "Use case binding failed", ex)
