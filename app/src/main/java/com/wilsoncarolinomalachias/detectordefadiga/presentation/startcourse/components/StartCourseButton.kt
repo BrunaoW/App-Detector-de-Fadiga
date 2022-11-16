@@ -13,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
 
 @Composable
 fun StartCourseButton(
@@ -22,12 +24,12 @@ fun StartCourseButton(
     Box(
         contentAlignment= Alignment.Center,
         modifier = Modifier
-            .background(Color.Blue, shape = CircleShape)
-            .size(200.dp)
             .shadow(
-                2.dp,
+                6.dp,
                 shape = CircleShape
             )
+            .background(Color.Blue, shape = CircleShape)
+            .size(200.dp)
             .clickable {
                 onClickStartCourse()
             }
@@ -38,5 +40,15 @@ fun StartCourseButton(
             color = Color.White,
             modifier = Modifier.padding(4.dp)
         )
+    }
+}
+
+@Preview
+@Composable
+fun StartCourseButtonPreview() {
+    DetectorDeFadigaTheme {
+        StartCourseButton {
+
+        }
     }
 }
