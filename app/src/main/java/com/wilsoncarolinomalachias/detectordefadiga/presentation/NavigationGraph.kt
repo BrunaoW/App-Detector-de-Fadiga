@@ -1,5 +1,6 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -9,6 +10,7 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.FatigueDetectionScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.startcourse.StartCourseScreen
 
+@SuppressLint("UnsafeOptInUsageError")
 @Composable
 fun NavigationGraph(
     navController: NavHostController
