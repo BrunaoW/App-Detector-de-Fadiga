@@ -7,7 +7,7 @@
 
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -18,8 +18,9 @@
         android:id="@+id/faceBoundsOverlay"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/previewView"
+        app:layout_constraintLeft_toLeftOf="@+id/previewView"
+        app:layout_constraintRight_toRightOf="@+id/previewView"
+        app:layout_constraintTop_toTopOf="@+id/previewView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
