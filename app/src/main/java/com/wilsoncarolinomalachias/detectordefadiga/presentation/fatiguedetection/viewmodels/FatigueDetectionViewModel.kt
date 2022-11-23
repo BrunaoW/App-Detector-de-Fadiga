@@ -19,7 +19,7 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetectio
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executor
 
-class FatigueDetectionViewModel : ViewModel() {
+class FatigueDetectionViewModel : ViewModel(), IFatigueDetectionViewModel {
 
     val realTimeOpts = FaceDetectorOptions.Builder()
         .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
@@ -31,7 +31,7 @@ class FatigueDetectionViewModel : ViewModel() {
     lateinit var previewUseCase: Preview
     lateinit var imageAnalysis: ImageAnalysis
 
-    fun setPreviewUseCase(surfaceProvider: SurfaceProvider) {
+    override fun setPreviewUseCase(surfaceProvider: SurfaceProvider) {
         previewUseCase = Preview.Builder()
             .build()
             .also {
@@ -39,14 +39,14 @@ class FatigueDetectionViewModel : ViewModel() {
             }
     }
 
-    fun setImageAnalysis(dimensionX: Int, dimensionY: Int) {
+    override fun setImageAnalysis(dimensionX: Int, dimensionY: Int) {
         imageAnalysis = ImageAnalysis.Builder()
             .setTargetResolution(Size(dimensionX, dimensionY))
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
     }
     
-    fun setAnalyzer(executor: Executor, processImageCallback: (List<PointF>) -> Unit = {}) {
+    override fun setAnalyzer(executor: Executor, processImageCallback: (List<PointF>) -> Unit) {
         imageAnalysis.setAnalyzer(executor) { imageProxy ->
             val rotationDegrees = imageProxy.imageInfo.rotationDegrees
             val image = imageProxy.image
@@ -74,7 +74,7 @@ class FatigueDetectionViewModel : ViewModel() {
         }
     }
     
-    fun setCameraProvider(lifecycleOwner: LifecycleOwner, context: Context) {
+    override fun setCameraProvider(lifecycleOwner: LifecycleOwner, context: Context) {
         viewModelScope.launch { 
             try {
                 val cameraProvider = context.getCameraProvider()
