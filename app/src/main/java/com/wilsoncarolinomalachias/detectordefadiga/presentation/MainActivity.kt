@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
@@ -29,12 +30,15 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val navController = rememberNavController()
-                    
+
                     Scaffold(
-                        bottomBar = { BottomNav(navController = navController)}
-                    ) {
-                        NavigationGraph(navController = navController)
-                    }
+                        bottomBar = {
+                            BottomNav(navController = navController)
+                        },
+                        content = {
+                            NavigationGraph(navController = navController, modifier = Modifier.padding(it))
+                        }
+                    )
                 }
             }
         }
