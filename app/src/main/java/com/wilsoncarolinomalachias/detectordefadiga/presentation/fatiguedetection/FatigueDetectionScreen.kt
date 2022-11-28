@@ -8,10 +8,13 @@ import android.view.ViewGroup
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -19,28 +22,52 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wilsoncarolinomalachias.detectordefadiga.R
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.FaceBoundsOverlay
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.executor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.FatigueDetectionViewModel
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.IFatigueDetectionViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import kotlinx.coroutines.delay
+import java.util.*
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @ExperimentalGetImage
 @Composable
 fun FatigueDetectionScreen(
     modifier: Modifier = Modifier,
     scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FILL_CENTER,
-    fatigueDetectionViewModel: FatigueDetectionViewModel = viewModel()
+    fatigueDetectionViewModel: IFatigueDetectionViewModel = FatigueDetectionViewModel()
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    var timeSpentInSeconds by remember { mutableStateOf(0) }
+    var timeSpentText by remember { mutableStateOf("") }
+
+    val interactionSource = remember { MutableInteractionSource() }
+
+
+    var fatigueDetectedCount by remember { mutableStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1.seconds)
+            timeSpentInSeconds++
+            val timeSpentMinutesText = ((timeSpentInSeconds % 3600) / 60).toString().padStart(2, '0')
+            val timeSpentSecondsText = (timeSpentInSeconds % 60).toString().padStart(2, '0')
+            timeSpentText = "$timeSpentMinutesText:$timeSpentSecondsText"
+        }
+    }
 
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         AndroidView(
             modifier = Modifier
-                .padding(24.dp)
                 .border(2.dp, Color.Red),
             factory = { context ->
                 val rootView = getRootView(context)
@@ -61,16 +88,39 @@ fun FatigueDetectionScreen(
                 return@AndroidView rootView
             }
         )
-        Row {
-            Text(text = "Tempo de corrida:", modifier = Modifier.fillMaxWidth())
-            Text(text = "00:00")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Tempo de corrida:")
+            Text(text = timeSpentText)
         }
-        Row {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Text(text = "Fadigas detectadas:")
-            Text(text = "00")
+            Text(text = "$fatigueDetectedCount")
         }
-        Button(onClick = { /*TODO*/ }) {
-
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) { },
+            onClick = { /*TODO*/ },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.Blue,
+                contentColor = Color.White
+            ),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                disabledElevation = 0.dp
+            )
+        ) {
+            Text(text = "Finalizar corrida")
         }
     }
 }
@@ -94,13 +144,13 @@ private fun getRootView(context: Context): View {
         ).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
+                ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
 }
 
 private fun setupFatigueDetection(
-    fatigueDetectionViewModel: FatigueDetectionViewModel,
+    fatigueDetectionViewModel: IFatigueDetectionViewModel,
     previewView: PreviewView,
     rootView: View,
     context: Context,
