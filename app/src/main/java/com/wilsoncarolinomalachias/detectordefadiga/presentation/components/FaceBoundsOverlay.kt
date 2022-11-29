@@ -18,14 +18,16 @@ class FaceBoundsOverlay constructor(context: Context?, attributeSet: AttributeSe
     private val faceBounds: MutableList<PointF> = mutableListOf()
     private val paint = Paint().apply {
         style = Paint.Style.FILL
-        color = ContextCompat.getColor(context!!, R.color.teal_200)
-        strokeWidth = 10f
+        color = ContextCompat.getColor(context!!, R.color.red)
+        strokeWidth = 5f
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         faceBounds.forEach {
-            canvas.drawCircle(it.x, it.y, 5f, paint)
+            val actualX = width - it.x
+
+            canvas.drawCircle(actualX, it.y, 5f, paint)
         }
     }
 

@@ -19,7 +19,7 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetectio
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executor
 
-class FatigueDetectionViewModel : ViewModel(), IFatigueDetectionViewModel {
+class FatigueDetectionViewModel : ViewModel() {
 
     val realTimeOpts = FaceDetectorOptions.Builder()
         .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
@@ -31,7 +31,7 @@ class FatigueDetectionViewModel : ViewModel(), IFatigueDetectionViewModel {
     lateinit var previewUseCase: Preview
     lateinit var imageAnalysis: ImageAnalysis
 
-    override fun setPreviewUseCase(surfaceProvider: SurfaceProvider) {
+    fun setPreviewUseCase(surfaceProvider: SurfaceProvider) {
         previewUseCase = Preview.Builder()
             .build()
             .also {
@@ -39,14 +39,14 @@ class FatigueDetectionViewModel : ViewModel(), IFatigueDetectionViewModel {
             }
     }
 
-    override fun setImageAnalysis(dimensionX: Int, dimensionY: Int) {
+    fun setImageAnalysis(dimensionX: Int, dimensionY: Int) {
         imageAnalysis = ImageAnalysis.Builder()
             .setTargetResolution(Size(dimensionX, dimensionY))
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
     }
     
-    override fun setAnalyzer(executor: Executor, processImageCallback: (List<PointF>) -> Unit) {
+    fun setAnalyzer(executor: Executor, processImageCallback: (List<PointF>) -> Unit) {
         imageAnalysis.setAnalyzer(executor) { imageProxy ->
             val rotationDegrees = imageProxy.imageInfo.rotationDegrees
             val image = imageProxy.image
@@ -74,7 +74,7 @@ class FatigueDetectionViewModel : ViewModel(), IFatigueDetectionViewModel {
         }
     }
     
-    override fun setCameraProvider(lifecycleOwner: LifecycleOwner, context: Context) {
+    fun setCameraProvider(lifecycleOwner: LifecycleOwner, context: Context) {
         viewModelScope.launch { 
             try {
                 val cameraProvider = context.getCameraProvider()
@@ -87,6 +87,16 @@ class FatigueDetectionViewModel : ViewModel(), IFatigueDetectionViewModel {
                 Log.e("CameraPreview", "Use case binding failed", ex)
             }
         }
+    }
+
+    fun updateImageViewResolution(width: Int, height: Int) {
+        if (imageAnalysis.camera == null) {
+            return
+        }
+
+        imageAnalysis.updateSuggestedResolution(
+            Size(width, height)
+        )
     }
 
 }

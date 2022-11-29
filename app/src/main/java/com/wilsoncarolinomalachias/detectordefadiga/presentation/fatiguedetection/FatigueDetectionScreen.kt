@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
@@ -30,7 +31,6 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.FaceBoundsOverlay
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.executor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.FatigueDetectionViewModel
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.IFatigueDetectionViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
 import kotlinx.coroutines.delay
 import java.util.*
@@ -43,7 +43,7 @@ import kotlin.time.ExperimentalTime
 fun FatigueDetectionScreen(
     modifier: Modifier = Modifier,
     scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FILL_CENTER,
-    fatigueDetectionViewModel: IFatigueDetectionViewModel = FatigueDetectionViewModel(),
+    fatigueDetectionViewModel: FatigueDetectionViewModel = viewModel(),
     navController: NavHostController
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -91,7 +91,13 @@ fun FatigueDetectionScreen(
 
                 return@AndroidView rootView
             }
-        )
+        ) {
+            val faceBoundsOverlayView = it.findViewById<FaceBoundsOverlay>(R.id.faceBoundsOverlay)
+            fatigueDetectionViewModel.updateImageViewResolution(
+                faceBoundsOverlayView.width,
+                faceBoundsOverlayView.height
+            )
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -167,7 +173,7 @@ private fun getRootView(context: Context): View {
 }
 
 private fun setupFatigueDetection(
-    fatigueDetectionViewModel: IFatigueDetectionViewModel,
+    fatigueDetectionViewModel: FatigueDetectionViewModel,
     previewView: PreviewView,
     rootView: View,
     context: Context,
