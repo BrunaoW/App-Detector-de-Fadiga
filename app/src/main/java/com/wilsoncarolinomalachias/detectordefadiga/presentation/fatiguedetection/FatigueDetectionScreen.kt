@@ -22,7 +22,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
+import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.R
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.FaceBoundsOverlay
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.executor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.FatigueDetectionViewModel
@@ -39,14 +43,14 @@ import kotlin.time.ExperimentalTime
 fun FatigueDetectionScreen(
     modifier: Modifier = Modifier,
     scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FILL_CENTER,
-    fatigueDetectionViewModel: IFatigueDetectionViewModel = FatigueDetectionViewModel()
+    fatigueDetectionViewModel: IFatigueDetectionViewModel = FatigueDetectionViewModel(),
+    navController: NavHostController
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var timeSpentInSeconds by remember { mutableStateOf(0) }
     var timeSpentText by remember { mutableStateOf("") }
 
     val interactionSource = remember { MutableInteractionSource() }
-
 
     var fatigueDetectedCount by remember { mutableStateOf(0) }
 
@@ -109,7 +113,18 @@ fun FatigueDetectionScreen(
                     interactionSource = interactionSource,
                     indication = null
                 ) { },
-            onClick = { /*TODO*/ },
+            onClick = {
+                val navOptions = NavOptions
+                    .Builder()
+                    .setPopUpTo(Screen.StartCourseScreen.route, false)
+                    .build()
+
+                navController.navigate(
+                    Screen.CourseReport.route,
+                    navOptions,
+                    null
+                )
+            },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Blue,
                 contentColor = Color.White
@@ -129,8 +144,10 @@ fun FatigueDetectionScreen(
 @Preview
 @Composable
 fun FatigueDetectionScreenPreview() {
+    val navController = rememberNavController()
+
     DetectorDeFadigaTheme {
-        FatigueDetectionScreen()
+        FatigueDetectionScreen(navController = navController)
     }
 }
 

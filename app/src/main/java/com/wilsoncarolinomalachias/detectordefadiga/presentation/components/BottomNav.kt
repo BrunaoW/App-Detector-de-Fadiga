@@ -16,7 +16,8 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 fun BottomNav(
     navController: NavController
 ) {
-    val navItems = listOf(
+    val screens = Screen.getAllScreens()
+    val mainNavigationScreenList = listOf(
         Screen.StartCourseScreen,
         Screen.UserProfile,
         Screen.CoursesHistory
@@ -27,17 +28,19 @@ fun BottomNav(
         contentColor = Color.Blue
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
+        val currentScreen = screens.find { navBackStackEntry?.destination?.route == it.route }
 
-        navItems.forEach { navItem ->
+        mainNavigationScreenList.forEach { navItem ->
+            val isIconSelected = currentScreen?.iconResourceId == navItem.iconResourceId
+
             BottomNavigationItem(
                 icon = { Icon(painter = painterResource(id = navItem.iconResourceId!!), contentDescription = navItem.route) },
                 selectedContentColor = Color.Blue,
                 unselectedContentColor = Color.Gray,
                 alwaysShowLabel = false,
-                selected = currentRoute == navItem.route,
+                selected = isIconSelected,
                 onClick = {
-                    /*TODO*/
+                    navController.navigate(navItem.route)
                 }
             )
         }
