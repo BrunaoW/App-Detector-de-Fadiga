@@ -5,6 +5,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('./keystore.jks')
+            storePassword 'wilsoncarolinomalachias'
+            keyAlias 'keystore'
+            keyPassword 'wilsoncarolinomalachias'
+        }
+    }
     namespace 'com.wilsoncarolinomalachias.detectordefadiga'
     compileSdk 32
 
@@ -23,7 +31,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

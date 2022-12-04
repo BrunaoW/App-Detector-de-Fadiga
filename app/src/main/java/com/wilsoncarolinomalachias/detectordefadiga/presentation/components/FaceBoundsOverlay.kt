@@ -6,14 +6,17 @@ import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.Size
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.face.FaceLandmark
 import com.wilsoncarolinomalachias.detectordefadiga.R
 
 /** Overlay where face bounds are drawn.  */
-class FaceBoundsOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
-    View(context, attributeSet) {
+class FaceBoundsOverlay constructor(
+    context: Context?,
+    attributeSet: AttributeSet?
+) : View(context, attributeSet) {
 
     private val faceBounds: MutableList<PointF> = mutableListOf()
     private val paint = Paint().apply {
@@ -25,9 +28,10 @@ class FaceBoundsOverlay constructor(context: Context?, attributeSet: AttributeSe
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         faceBounds.forEach {
-            val actualX = width - it.x
+            val actualX = (width - (it.x * (3.5/4))).toFloat()
+            val actualY = (it.y * (3.5/4)).toFloat()
 
-            canvas.drawCircle(actualX, it.y, 5f, paint)
+            canvas.drawCircle(actualX, actualY, 5f, paint)
         }
     }
 
