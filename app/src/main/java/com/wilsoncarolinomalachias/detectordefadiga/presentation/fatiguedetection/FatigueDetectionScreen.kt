@@ -1,6 +1,7 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,7 +31,6 @@ import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.R
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.FaceBoundsOverlay
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.executor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.FatigueDetectionViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
 import kotlinx.coroutines.delay
@@ -52,7 +53,7 @@ fun FatigueDetectionScreen(
 
     val interactionSource = remember { MutableInteractionSource() }
 
-    var fatigueDetectedCount by remember { mutableStateOf(0) }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -73,7 +74,7 @@ fun FatigueDetectionScreen(
         AndroidView(
             modifier = Modifier
                 .border(2.dp, Color.Red),
-            factory = { context ->
+            factory = {
                 val rootView = getRootView(context)
                 val previewView = rootView.findViewById<PreviewView>(R.id.previewView).apply {
                     this.scaleType = scaleType
@@ -110,7 +111,7 @@ fun FatigueDetectionScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = "Fadigas detectadas:")
-            Text(text = "$fatigueDetectedCount")
+            Text(text = "${fatigueDetectionViewModel.fatigueDetectedCount}")
         }
         Button(
             modifier = Modifier
@@ -185,7 +186,7 @@ private fun setupFatigueDetection(
         rootView.width,
         rootView.height
     )
-    fatigueDetectionViewModel.setAnalyzer(context.executor) {
+    fatigueDetectionViewModel.initAnalyzer(context) {
         faceBoundsOverlay.drawFaceBounds(it)
     }
     fatigueDetectionViewModel.setCameraProvider(lifecycleOwner, context)

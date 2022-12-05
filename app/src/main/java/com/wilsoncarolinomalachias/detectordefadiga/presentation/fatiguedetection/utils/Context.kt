@@ -1,6 +1,8 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils
 
 import android.content.Context
+import android.content.ContextWrapper
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import java.util.concurrent.Executor
