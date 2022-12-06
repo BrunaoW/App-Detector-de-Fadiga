@@ -1,7 +1,6 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -13,36 +12,55 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
-fun CourseCardGreen() {
+fun CourseCardGreen(
+    courseFinishDate: Date,
+    courseStartAddress: String,
+    courseDestinationAddress: String
+) {
+    val courseFinishDateAsString =  SimpleDateFormat(
+        "yyyy-MM-dd HH:mm",
+        Locale.getDefault()
+    ).format(courseFinishDate)
 
-    val Verde = Color(0xFF1CC900)
+    val greenColor = Color(0xFF1CC900)
 
-    val paddingModifier = Modifier.padding(10.dp)
     val mainButtonColor = ButtonDefaults.buttonColors(
-        backgroundColor = Verde,
+        backgroundColor = greenColor,
     )
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Card(
             shape = RoundedCornerShape(20.dp),
             elevation = 10.dp,
-            border = BorderStroke(3.dp, Verde),
-            modifier = paddingModifier
+            border = BorderStroke(3.dp, greenColor),
+            modifier = Modifier.padding(10.dp)
         ) {
 
-            Column(modifier = paddingModifier, verticalArrangement = Arrangement.spacedBy(4.dp)){
+            Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)){
                 Text(text = "Corrida", fontSize = 20.sp)
-                Text(text = "Finalizada em 03/10/2022 às 19:30", fontSize = 14.sp, color = Verde)
-                Text(text = "De: Rua João de Paula, Sagrada F. - Belo Horizonte", fontSize = 14.sp)
-                Text(text = "Para: Belo Vale - MG", fontSize = 14.sp)
+                Text(text = "Finalizada em $courseFinishDateAsString", fontSize = 14.sp, color = greenColor)
+                Text(text = "De: $courseStartAddress", fontSize = 14.sp)
+                Text(text = "Para: $courseDestinationAddress", fontSize = 14.sp)
 
-                Button(colors = mainButtonColor, shape = RoundedCornerShape(50), onClick = { /*TODO*/ }, modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .align(Alignment.CenterHorizontally)
+                Button(
+                    colors = mainButtonColor,
+                    shape = RoundedCornerShape(50),
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .align(Alignment.CenterHorizontally)
                 )
                 {
-                    Text(text = "GERAR RELATÓRIO", fontSize = 12.sp, color = Color.White)
+                    Text(
+                        text = "GERAR RELATÓRIO",
+                        fontSize = 12.sp,
+                        color = Color.White
+                    )
                 }
             }
         }
@@ -52,34 +70,53 @@ fun CourseCardGreen() {
 
 
 @Composable
-fun CourseCardOrange() {
-    val Laranja = Color(0xFFFF9500)
+fun CourseCardOrange(
+    courseFinishDate: Date,
+    courseStartAddress: String,
+    courseDestinationAddress: String
+) {
+    val courseFinishDateAsString =  SimpleDateFormat(
+        "yyyy-MM-dd HH:mm",
+        Locale.getDefault()
+    ).format(courseFinishDate)
 
-    val paddingModifier = Modifier.padding(10.dp)
+    val orangeColor = Color(0xFFFF9500)
+
     val mainButtonColor = ButtonDefaults.buttonColors(
-        backgroundColor = Laranja,
+        backgroundColor = orangeColor,
     )
+
     Column() {
         Card(
             shape = RoundedCornerShape(20.dp),
             elevation = 10.dp,
-            border = BorderStroke(3.dp, Laranja),
-            modifier = paddingModifier
+            border = BorderStroke(3.dp, orangeColor),
+            modifier = Modifier.padding(10.dp)
         ) {
 
-            Column(modifier = paddingModifier, verticalArrangement = Arrangement.spacedBy(4.dp)){
-                Text(text = "Corrida", fontSize = 20.sp)
-                Text(text = "Finalizada em 03/10/2022 às 19:30", fontSize = 14.sp, color = Laranja)
-                Text(text = "De: Rua João de Paula, Sagrada F. - Belo Horizonte", fontSize = 14.sp)
-                Text(text = "Para: Belo Vale - MG", fontSize = 14.sp)
+            Column(
+                modifier = Modifier.padding(10.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(text = "Corrida - Fadiga detectada", fontSize = 20.sp)
+                Text(text = "Finalizada em $courseFinishDateAsString", fontSize = 14.sp, color = orangeColor)
+                Text(text = "De: $courseStartAddress", fontSize = 14.sp)
+                Text(text = "Para: $courseDestinationAddress", fontSize = 14.sp)
 
-                Button(colors = mainButtonColor, shape = RoundedCornerShape(50), onClick = { /*TODO*/ }, modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .align(Alignment.CenterHorizontally)
-
+                Button(
+                    colors = mainButtonColor,
+                    shape = RoundedCornerShape(50),
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .align(Alignment.CenterHorizontally)
                 )
                 {
-                    Text(text = "GERAR RELATÓRIO", fontSize = 12.sp, color = Color.White)
+                    Text(
+                        text = "GERAR RELATÓRIO",
+                        fontSize = 12.sp,
+                        color = Color.White
+                    )
                 }
             }
         }
@@ -88,8 +125,24 @@ fun CourseCardOrange() {
 
 @Preview
 @Composable
-fun CourseCardPreview() {
+fun OrangeCourseCardPreview() {
     DetectorDeFadigaTheme {
-        CourseCardOrange()
+        CourseCardOrange(
+            Date(),
+            "Rua João de Paula, Sagrada F. - Belo Horizonte",
+            "Belo Vale = MG"
+        )
+    }
+}
+
+@Preview
+@Composable
+fun GreenCourseCardPreview() {
+    DetectorDeFadigaTheme {
+        CourseCardGreen(
+            Date(),
+            "Rua João de Paula, Sagrada F. - Belo Horizonte",
+            "Belo Vale = MG"
+        )
     }
 }
