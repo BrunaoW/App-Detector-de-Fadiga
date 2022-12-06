@@ -23,11 +23,15 @@ fun NavigationGraph(
         modifier = modifier
     ) {
         composable(route = Screen.StartCourseScreen.route) {
-            StartCourseScreen(navController)
+            StartCourseScreen(
+                navController = navController
+            )
         }
 
         composable(route = Screen.FatigueDetection.route) {
-            FatigueDetectionScreen()
+            FatigueDetectionScreen(
+                navController = navController
+            )
         }
 
         composable(route = Screen.CourseReport.route) {
