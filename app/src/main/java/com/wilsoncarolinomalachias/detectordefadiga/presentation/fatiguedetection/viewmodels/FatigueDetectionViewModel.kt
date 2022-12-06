@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
+import com.google.mlkit.vision.face.FaceContour
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.executor
@@ -60,16 +61,22 @@ class FatigueDetectionViewModel : ViewModel() {
     }
 
     private val fatigueAlarmTimer = object : CountDownTimer(4000, 500) {
+        var isRunningAlarm: Boolean = false
+
         override fun onTick(millisUntilFinished: Long) { }
 
         override fun onFinish() {
+            isRunningAlarm = false
+            yawnAndTimeOccured.clear()
             ringtoneManager.stop()
         }
     }
 
-    private var yawnCount: Int = 0
+    private var isYawnOccuring: Boolean = false
+    private val yawnAndTimeOccured: MutableList<Long> = mutableListOf()
 
     private fun notifyFatigue() {
+        fatigueAlarmTimer.isRunningAlarm = true
         ringtoneManager.play()
         fatigueAlarmTimer.start()
         fatigueDetectedCount += 1
@@ -129,23 +136,43 @@ class FatigueDetectionViewModel : ViewModel() {
     private fun processFaceFeaturesAndDetectFatigue(face: Face, routineTimeStart: Date) {
         detectEyesClosedForTooLong(face)
         detectMultipleYawnsInShortSpan(face, routineTimeStart)
-        detectFocusDeviationFromTheRoad(face)
-    }
-
-    private fun detectFocusDeviationFromTheRoad(face: Face) {
-        // Salvar o "foco médio" do motorista (rotação da face em relação à câmera)
-
-        // Checar se o desvio do foco está maior de uma dada porcentagem/angulo durante um tempo longo
-        // Exemplo: 30%/40º por 4-5 segundos
-
-        // Se sim, enviar evento de fadiga
     }
 
     private fun detectMultipleYawnsInShortSpan(face: Face, routineTimeStart: Date) {
-        // Fazer uma contagem de bocejos
+        // Detectar se boca abriu e ficou por pelo menos 2 segundos
+        val upperLipBottom = face.getContour(FaceContour.UPPER_LIP_BOTTOM)
+        val lowerLipTop = face.getContour(FaceContour.LOWER_LIP_TOP)
 
+        val uppperLipBottomPositionSum = upperLipBottom?.points?.fold(0f) { acc, point ->
+            return@fold acc + point.x + point.y
+        } ?: 0f
 
+        val lowerLipTopPositionSum = lowerLipTop?.points?.fold(0f) { acc, point ->
+            return@fold acc + point.x + point.y
+        } ?: 0f
+
+        val sumPercentDiff = uppperLipBottomPositionSum / lowerLipTopPositionSum
+        val actualTime = Date()
+
+        // Fazer uma contagem de bocejos:
         // Caso tenha bocejado 2 vezes em um tempo de 1 minuto, enviar evento de fadiga
+        if (sumPercentDiff < 0.99 && !isYawnOccuring) {
+            isYawnOccuring = true
+            yawnAndTimeOccured.add(actualTime.time)
+        } else if (sumPercentDiff >= 0.99) {
+            isYawnOccuring = false
+        }
+
+        if (isYawnOccuring)
+            return
+
+        val yawnsHappenedInLastMinute = yawnAndTimeOccured.count {
+            (it - actualTime.time) < 60
+        }
+
+        if (yawnsHappenedInLastMinute > 2 && !fatigueAlarmTimer.isRunningAlarm) {
+            notifyFatigue()
+        }
     }
 
     private fun detectEyesClosedForTooLong(face: Face) {
