@@ -35,168 +35,136 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.RoundedButton
 
 
 @Composable
-fun SignInScreen() {
+fun SignInScreen(
+    navController: NavHostController
+) {
 
     val emailValue = rememberSaveable{ mutableStateOf("") }
     val passwordValue = rememberSaveable{ mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colors.background),
     ) {
         Image(
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .fillMaxWidth(),
             painter = painterResource(id = R.drawable.detec),
             contentDescription = "Login",
             contentScale = ContentScale.Inside
         )
-    }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        ConstraintLayout {
-            val (surface, fab) = createRefs()
+        Text(
+            text = "Detector de Fadiga",
+            style = MaterialTheme.typography.h4.copy(
+                fontWeight = FontWeight.Medium
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            textAlign = TextAlign.Center
+        )
 
-            Surface(
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            TransparentTextField(
+                textFieldValue = emailValue,
+                textLabel = "Email",
+                keyboardType = KeyboardType.Email,
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                ),
+                imeAction = ImeAction.Next
+            )
+
+            TransparentTextField(
+                textFieldValue = passwordValue,
+                textLabel = "Password",
+                keyboardType = KeyboardType.Password,
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
+                ),
+                imeAction = ImeAction.Done,
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            passwordVisibility = !passwordVisibility
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if(passwordVisibility) {
+                                Icons.Default.Visibility
+                            } else {
+                                Icons.Default.VisibilityOff
+                            },
+                            contentDescription = "Toggle Password Icon"
+                        )
+                    }
+                },
+                visualTransformation = if(passwordVisibility) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                }
+            )
+
+            Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(550.dp)
-                    .constrainAs(surface) {
-                        bottom.linkTo(parent.bottom)
-                    },
-                color = Color.White,
-                shape = RoundedCornerShape(
-                    topStartPercent = 8,
-                    topEndPercent = 8
-                )
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Text(
-                        text = "Detector de Fadiga ",
-                        style = MaterialTheme.typography.h4.copy(
-                            fontWeight = FontWeight.Medium
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        textAlign = TextAlign.Center
-                    )
+                    .padding(vertical = 8.dp),
+                text = "Forgot Password?",
+                style = MaterialTheme.typography.body1,
+                textAlign = TextAlign.End
+            )
+        }
 
-                    Text(
-                        text = "Login to your Account",
-                        style = MaterialTheme.typography.h5.copy(
-                            color = MaterialTheme.colors.primary
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        textAlign = TextAlign.Center
-                    )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            RoundedButton(
+                text = "Login",
+                displayProgressBar = false,
+                onClick = {
+                    // TODO("LOGIN")
+                }
+            )
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        TransparentTextField(
-                            textFieldValue = emailValue,
-                            textLabel = "Email",
-                            keyboardType = KeyboardType.Email,
-                            keyboardActions = KeyboardActions(
-                                onNext = {
-                                    focusManager.moveFocus(FocusDirection.Down)
-                                }
-                            ),
-                            imeAction = ImeAction.Next
+            ClickableText(
+                text = buildAnnotatedString {
+                    append("Do not have an Account?")
+
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colors.primary,
+                            fontWeight = FontWeight.Bold
                         )
-
-                        TransparentTextField(
-                            textFieldValue = passwordValue,
-                            textLabel = "Password",
-                            keyboardType = KeyboardType.Password,
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    focusManager.clearFocus()
-                                }
-                            ),
-                            imeAction = ImeAction.Done,
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = {
-                                        passwordVisibility = !passwordVisibility
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = if(passwordVisibility) {
-                                            Icons.Default.Visibility
-                                        } else {
-                                            Icons.Default.VisibilityOff
-                                        },
-                                        contentDescription = "Toggle Password Icon"
-                                    )
-                                }
-                            },
-                            visualTransformation = if(passwordVisibility) {
-                                VisualTransformation.None
-                            } else {
-                                PasswordVisualTransformation()
-                            }
-                        )
-
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Forgot Password?",
-                            style = MaterialTheme.typography.body1,
-                            textAlign = TextAlign.End
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        RoundedButton(
-                            text = "Login",
-                            displayProgressBar = false,
-                            onClick = {
-                                // TODO("LOGIN")
-                            }
-                        )
-
-                        ClickableText(
-                            text = buildAnnotatedString {
-                                append("Do not have an Account?")
-
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = MaterialTheme.colors.primary,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                ){
-                                    append("Sign up")
-                                }
-                            }
-                        ){
-                            // TODO("NAVIGATE TO REGISTER SCREEN")
-                        }
+                    ){
+                        append("Sign up")
                     }
                 }
+            ){
+                // TODO("NAVIGATE TO REGISTER SCREEN")
             }
         }
     }
@@ -205,7 +173,8 @@ fun SignInScreen() {
 @Preview
 @Composable
 fun SignInPreview() {
+    val navController = rememberNavController()
     DetectorDeFadigaTheme {
-        SignInScreen()
+        SignInScreen(navController)
     }
 }
