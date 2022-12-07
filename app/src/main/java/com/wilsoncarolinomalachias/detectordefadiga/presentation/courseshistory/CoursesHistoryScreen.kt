@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -16,13 +15,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.viewmodels.CourseHistoryViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
 
 
 @Composable
 fun CoursesHistoryScreen(
-    coursesHistoryViewModel: CourseHistoryViewModel = viewModel()
+    coursesHistoryViewModel: CourseHistoryViewModel = viewModel(),
+    navController: NavHostController
 ) {
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
     val context = LocalContext.current
@@ -38,7 +40,11 @@ fun CoursesHistoryScreen(
                     Text("Relatórios")
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(
+                        onClick = {
+                            navController.navigateUp()
+                        }
+                    ) {
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
                 },
@@ -85,7 +91,8 @@ fun CoursesHistoryScreen(
 @Preview
 @Composable
 fun CoursesHistoryPreview() {
+    val navController = rememberNavController()
     DetectorDeFadigaTheme {
-        CoursesHistoryScreen()
+        CoursesHistoryScreen(navController = navController)
     }
 }

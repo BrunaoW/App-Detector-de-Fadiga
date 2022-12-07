@@ -39,7 +39,9 @@ fun NavigationGraph(
         }
 
         composable(route = Screen.CoursesHistory.route) {
-            CoursesHistoryScreen()
+            CoursesHistoryScreen(
+                navController = navController
+            )
         }
 
         composable(route = Screen.UserProfile.route) {
