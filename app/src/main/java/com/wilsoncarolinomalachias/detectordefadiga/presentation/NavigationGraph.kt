@@ -46,7 +46,9 @@ fun NavigationGraph(
         }
 
         composable(route = Screen.UserProfile.route) {
-            SignInScreen()
+            SignInScreen(
+                navController = navController
+            )
         }
     }
 }

@@ -35,11 +35,15 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.RoundedButton
 
 
 @Composable
-fun SignInScreen() {
+fun SignInScreen(
+    navController: NavHostController
+) {
 
     val emailValue = rememberSaveable{ mutableStateOf("") }
     val passwordValue = rememberSaveable{ mutableStateOf("") }
@@ -50,7 +54,6 @@ fun SignInScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.background),
-        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Image(
             modifier = Modifier
@@ -68,16 +71,16 @@ fun SignInScreen() {
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             textAlign = TextAlign.Center
         )
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.Center
         ) {
             TransparentTextField(
                 textFieldValue = emailValue,
@@ -125,7 +128,9 @@ fun SignInScreen() {
             )
 
             Text(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
                 text = "Forgot Password?",
                 style = MaterialTheme.typography.body1,
                 textAlign = TextAlign.End
@@ -168,7 +173,8 @@ fun SignInScreen() {
 @Preview
 @Composable
 fun SignInPreview() {
+    val navController = rememberNavController()
     DetectorDeFadigaTheme {
-        SignInScreen()
+        SignInScreen(navController)
     }
 }
