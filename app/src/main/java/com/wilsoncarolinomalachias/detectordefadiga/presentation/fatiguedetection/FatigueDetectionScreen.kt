@@ -1,6 +1,7 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -17,16 +18,20 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
+import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.R
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.FaceBoundsOverlay
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.executor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.FatigueDetectionViewModel
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.IFatigueDetectionViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
 import kotlinx.coroutines.delay
 import java.util.*
@@ -39,7 +44,8 @@ import kotlin.time.ExperimentalTime
 fun FatigueDetectionScreen(
     modifier: Modifier = Modifier,
     scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FILL_CENTER,
-    fatigueDetectionViewModel: IFatigueDetectionViewModel = FatigueDetectionViewModel()
+    fatigueDetectionViewModel: FatigueDetectionViewModel = viewModel(),
+    navController: NavHostController
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var timeSpentInSeconds by remember { mutableStateOf(0) }
@@ -47,8 +53,7 @@ fun FatigueDetectionScreen(
 
     val interactionSource = remember { MutableInteractionSource() }
 
-
-    var fatigueDetectedCount by remember { mutableStateOf(0) }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -69,7 +74,7 @@ fun FatigueDetectionScreen(
         AndroidView(
             modifier = Modifier
                 .border(2.dp, Color.Red),
-            factory = { context ->
+            factory = {
                 val rootView = getRootView(context)
                 val previewView = rootView.findViewById<PreviewView>(R.id.previewView).apply {
                     this.scaleType = scaleType
@@ -87,7 +92,13 @@ fun FatigueDetectionScreen(
 
                 return@AndroidView rootView
             }
-        )
+        ) {
+            val faceBoundsOverlayView = it.findViewById<FaceBoundsOverlay>(R.id.faceBoundsOverlay)
+            fatigueDetectionViewModel.updateImageViewResolution(
+                faceBoundsOverlayView.width,
+                faceBoundsOverlayView.height
+            )
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -100,7 +111,7 @@ fun FatigueDetectionScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = "Fadigas detectadas:")
-            Text(text = "$fatigueDetectedCount")
+            Text(text = "${fatigueDetectionViewModel.fatigueDetectedCount}")
         }
         Button(
             modifier = Modifier
@@ -109,7 +120,18 @@ fun FatigueDetectionScreen(
                     interactionSource = interactionSource,
                     indication = null
                 ) { },
-            onClick = { /*TODO*/ },
+            onClick = {
+                val navOptions = NavOptions
+                    .Builder()
+                    .setPopUpTo(Screen.StartCourseScreen.route, false)
+                    .build()
+
+                navController.navigate(
+                    Screen.CourseReport.route,
+                    navOptions,
+                    null
+                )
+            },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Blue,
                 contentColor = Color.White
@@ -129,8 +151,10 @@ fun FatigueDetectionScreen(
 @Preview
 @Composable
 fun FatigueDetectionScreenPreview() {
+    val navController = rememberNavController()
+
     DetectorDeFadigaTheme {
-        FatigueDetectionScreen()
+        FatigueDetectionScreen(navController = navController)
     }
 }
 
@@ -150,7 +174,7 @@ private fun getRootView(context: Context): View {
 }
 
 private fun setupFatigueDetection(
-    fatigueDetectionViewModel: IFatigueDetectionViewModel,
+    fatigueDetectionViewModel: FatigueDetectionViewModel,
     previewView: PreviewView,
     rootView: View,
     context: Context,
@@ -162,7 +186,7 @@ private fun setupFatigueDetection(
         rootView.width,
         rootView.height
     )
-    fatigueDetectionViewModel.setAnalyzer(context.executor) {
+    fatigueDetectionViewModel.initAnalyzer(context) {
         faceBoundsOverlay.drawFaceBounds(it)
     }
     fatigueDetectionViewModel.setCameraProvider(lifecycleOwner, context)
