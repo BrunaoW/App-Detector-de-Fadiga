@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport.CourseReportScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.CoursesHistoryScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.FatigueDetectionScreen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.signIn.SignInScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.startcourse.StartCourseScreen
 
 @SuppressLint("UnsafeOptInUsageError")
@@ -43,7 +44,7 @@ fun NavigationGraph(
         }
 
         composable(route = Screen.UserProfile.route) {
-            CourseReportScreen()
+            SignInScreen()
         }
     }
 }
