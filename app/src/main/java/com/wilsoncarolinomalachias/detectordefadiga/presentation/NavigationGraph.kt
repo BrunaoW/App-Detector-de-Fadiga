@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport.CourseReportScreen
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.CoursesHistoryScreen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components.CoursesHistoryScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.FatigueDetectionScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.signIn.SignInScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.startcourse.StartCourseScreen
@@ -40,7 +40,9 @@ fun NavigationGraph(
         }
 
         composable(route = Screen.CoursesHistory.route) {
-            CoursesHistoryScreen()
+            CoursesHistoryScreen(
+                navController = navController
+            )
         }
 
         composable(route = Screen.UserProfile.route) {
