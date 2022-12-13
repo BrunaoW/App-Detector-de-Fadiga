@@ -19,7 +19,8 @@ import java.util.*
 fun CourseCardGreen(
     courseFinishDate: Date,
     courseStartAddress: String,
-    courseDestinationAddress: String
+    courseDestinationAddress: String,
+    onClickViewReport: () -> Unit = {}
 ) {
     val courseFinishDateAsString =  SimpleDateFormat(
         "yyyy-MM-dd HH:mm",
@@ -33,13 +34,17 @@ fun CourseCardGreen(
     )
 
     Card(
-        shape = RoundedCornerShape(20.dp),
-        elevation = 10.dp,
+        shape = RoundedCornerShape(16.dp),
+        elevation = 8.dp,
         border = BorderStroke(3.dp, greenColor),
-        modifier = Modifier.padding(10.dp)
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
 
-        Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)){
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ){
             Text(text = "Corrida", fontSize = 20.sp)
             Text(text = "Finalizada em $courseFinishDateAsString", fontSize = 14.sp, color = greenColor)
             Text(text = "De: $courseStartAddress", fontSize = 14.sp)
@@ -48,14 +53,16 @@ fun CourseCardGreen(
             Button(
                 colors = mainButtonColor,
                 shape = RoundedCornerShape(50),
-                onClick = { /*TODO*/ },
+                onClick = {
+                    onClickViewReport()
+                },
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
+                    .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
             )
             {
                 Text(
-                    text = "GERAR RELATÓRIO",
+                    text = "VISUALIZAR RELATÓRIO",
                     fontSize = 12.sp,
                     color = Color.White
                 )
@@ -69,7 +76,8 @@ fun CourseCardGreen(
 fun CourseCardOrange(
     courseFinishDate: Date,
     courseStartAddress: String,
-    courseDestinationAddress: String
+    courseDestinationAddress: String,
+    onClickViewReport: () -> Unit = {}
 ) {
     val courseFinishDateAsString =  SimpleDateFormat(
         "yyyy-MM-dd HH:mm",
@@ -83,14 +91,15 @@ fun CourseCardOrange(
     )
 
     Card(
-        shape = RoundedCornerShape(20.dp),
-        elevation = 10.dp,
+        shape = RoundedCornerShape(16.dp),
+        elevation = 8.dp,
         border = BorderStroke(3.dp, orangeColor),
-        modifier = Modifier.padding(10.dp)
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
 
         Column(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(text = "Corrida - Fadiga detectada", fontSize = 20.sp)
@@ -101,14 +110,16 @@ fun CourseCardOrange(
             Button(
                 colors = mainButtonColor,
                 shape = RoundedCornerShape(50),
-                onClick = { /*TODO*/ },
+                onClick = {
+                    onClickViewReport()
+                },
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
+                    .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
             )
             {
                 Text(
-                    text = "GERAR RELATÓRIO",
+                    text = "VISUALIZAR RELATÓRIO",
                     fontSize = 12.sp,
                     color = Color.White
                 )

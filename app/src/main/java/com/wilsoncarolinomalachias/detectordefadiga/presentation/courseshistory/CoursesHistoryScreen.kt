@@ -1,6 +1,8 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components
 
+import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,8 +20,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.viewmodels.CourseHistoryViewModel
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.entities.Course
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
 
@@ -32,7 +37,6 @@ fun CoursesHistoryScreen(
     val context = LocalContext.current
 
     val courseViewModel = CourseViewModel(context)
-
     val coursesList = courseViewModel.coursesLiveData.observeAsState()
 
     Scaffold(
@@ -60,7 +64,7 @@ fun CoursesHistoryScreen(
             LazyColumn (
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally)
             {
@@ -79,13 +83,23 @@ fun CoursesHistoryScreen(
                         CourseCardOrange(
                             courseFinishDate = course.finishDate,
                             courseStartAddress = course.startAddress,
-                            courseDestinationAddress = course.destinationAddress
+                            courseDestinationAddress = course.destinationAddress,
+                            onClickViewReport = {
+                                navController.navigate(
+                                    Screen.CourseReport.route
+                                )
+                            }
                         )
                     } else {
                         CourseCardGreen(
                             courseFinishDate = course.finishDate,
                             courseStartAddress = course.startAddress,
-                            courseDestinationAddress = course.destinationAddress
+                            courseDestinationAddress = course.destinationAddress,
+                            onClickViewReport = {
+                                navController.navigate(
+                                    Screen.CourseReport.route
+                                )
+                            }
                         )
                     }
                 }
