@@ -46,7 +46,7 @@ fun ReportCard(
         ConstraintLayout(
             modifier = Modifier.padding(10.dp)
         ) {
-            val (headerRef, timelineRef, addressRef) = createRefs()
+            val (headerRef, timelineRef, addressListRef) = createRefs()
 
             Column(
                 modifier = Modifier
@@ -86,7 +86,7 @@ fun ReportCard(
             )
             LazyColumn(
                 modifier = Modifier
-                    .constrainAs(addressRef) {
+                    .constrainAs(addressListRef) {
                     top.linkTo(headerRef.bottom)
                     bottom.linkTo(parent.bottom)
                     start.linkTo(timelineRef.start,10.dp)
@@ -94,7 +94,27 @@ fun ReportCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 items(visitedAddresses) { address ->
-                    Text(address, fontSize = 14.sp)
+                    val (indicatorRef, addressRef) = createRefs()
+
+                    Icon(
+                        Icons.Rounded.LocationOn,
+                        contentDescription = "Localized description",
+                        tint = Color.Blue,
+                        modifier = Modifier
+                            .constrainAs(indicatorRef) {
+                                start.linkTo(timelineRef.start)
+                                end.linkTo(timelineRef.end)
+                            }
+                    )
+
+                    Text(
+                        address,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .constrainAs(addressRef) {
+                                start.linkTo(indicatorRef.end,10.dp)
+                            }
+                    )
                 }
             }
         }
