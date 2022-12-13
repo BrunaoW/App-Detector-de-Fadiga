@@ -130,15 +130,18 @@ class FatigueDetectionViewModel : ViewModel() {
                 detector
                     .process(processImage)
                     .addOnSuccessListener { faces ->
+                        val face = faces.firstOrNull()
 
-                        if (faces.isNullOrEmpty()) {
-                            faceNotFoundTimer.start()
-                            faceNotFoundTimer.isCountingTime = true
+                        if (face == null) {
+                            if (!faceNotFoundTimer.isCountingTime) {
+                                faceNotFoundTimer.start()
+                                faceNotFoundTimer.isCountingTime = true
+                            }
+
+                            processImageCallback(listOf())
                         } else {
                             faceNotFoundTimer.cancel()
                             faceNotFoundTimer.isCountingTime = false
-
-                            val face: Face = faces.first()
 
                             val allPoints = face.allContours.fold(listOf<PointF>()) { contours, contour ->
                                 contours + contour.points
