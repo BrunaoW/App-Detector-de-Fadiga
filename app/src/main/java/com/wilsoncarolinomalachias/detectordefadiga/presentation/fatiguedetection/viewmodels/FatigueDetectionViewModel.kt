@@ -11,7 +11,9 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.core.Preview.SurfaceProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
@@ -46,6 +48,21 @@ class FatigueDetectionViewModel : ViewModel() {
     private var rightEyeClosedProbability: Float = 0f
 
     private var isEyesCurrentlyClosed: Boolean = false
+
+    var isCurrentlyFaceNotFound = mutableStateOf(false)
+        private set
+
+    private val faceNotFoundTimer = object : CountDownTimer(10_000, 10_000) {
+        var isCountingTime: Boolean = false
+
+        override fun onTick(millisUntilFinished: Long) { }
+
+        override fun onFinish() {
+            ringtoneManager.play()
+            isCurrentlyFaceNotFound.value = true
+        }
+    }
+
     private val closedEyesTimer = object : CountDownTimer(2000, 2000) {
         var isCountingTime: Boolean = false
 
@@ -96,7 +113,7 @@ class FatigueDetectionViewModel : ViewModel() {
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
     }
-    
+
     fun initAnalyzer(context: Context, processImageCallback: (List<PointF>) -> Unit) {
         val executor = context.executor
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
@@ -113,15 +130,22 @@ class FatigueDetectionViewModel : ViewModel() {
                 detector
                     .process(processImage)
                     .addOnSuccessListener { faces ->
-                        val face: Face? = faces.firstOrNull()
 
-                        val allPoints = face?.allContours?.fold(listOf<PointF>()) { contours, contour ->
-                            contours + contour.points
-                        } ?: listOf()
+                        if (faces.isNullOrEmpty()) {
+                            faceNotFoundTimer.start()
+                            faceNotFoundTimer.isCountingTime = true
+                        } else {
+                            faceNotFoundTimer.cancel()
+                            faceNotFoundTimer.isCountingTime = false
 
-                        processImageCallback(allPoints)
-                        face?.let {
-                            processFaceFeaturesAndDetectFatigue(it, routineTimeStart)
+                            val face: Face = faces.first()
+
+                            val allPoints = face.allContours.fold(listOf<PointF>()) { contours, contour ->
+                                contours + contour.points
+                            }
+
+                            processImageCallback(allPoints)
+                            processFaceFeaturesAndDetectFatigue(face, routineTimeStart)
                         }
 
                         imageProxy.close()
@@ -131,6 +155,11 @@ class FatigueDetectionViewModel : ViewModel() {
                     }
             }
         }
+    }
+
+    fun resetIsFaceNotFound() {
+        isCurrentlyFaceNotFound.value = false
+        ringtoneManager.stop()
     }
 
     private fun processFaceFeaturesAndDetectFatigue(face: Face, routineTimeStart: Date) {
@@ -199,7 +228,7 @@ class FatigueDetectionViewModel : ViewModel() {
     }
 
     fun setCameraProvider(lifecycleOwner: LifecycleOwner, context: Context) {
-        viewModelScope.launch { 
+        viewModelScope.launch {
             try {
                 val cameraProvider = context.getCameraProvider()
                 // Must unbind the use-cases before rebinding them.
