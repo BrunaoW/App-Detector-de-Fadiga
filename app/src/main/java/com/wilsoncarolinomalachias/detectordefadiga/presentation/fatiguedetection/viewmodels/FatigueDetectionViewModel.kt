@@ -19,6 +19,7 @@ import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceContour
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.entities.Course
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.executor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.getCameraProvider
 import kotlinx.coroutines.launch
@@ -221,6 +222,19 @@ class FatigueDetectionViewModel : ViewModel() {
         imageAnalysis.updateSuggestedResolution(
             Size(width, height)
         )
+    }
+
+    fun generateCourse(): Course {
+        val course = Course(
+            uid = 0,
+            startDate = Date(),
+            finishDate = Date(),
+            startAddress = "Rua João de paula",
+            destinationAddress = "Rua Caetés",
+            fatigueCount = fatigueDetectedCount
+        )
+
+        return course
     }
 
 }

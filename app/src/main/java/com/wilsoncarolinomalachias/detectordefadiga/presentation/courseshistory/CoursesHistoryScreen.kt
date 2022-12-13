@@ -19,18 +19,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.viewmodels.CourseHistoryViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
 
 
 @Composable
 fun CoursesHistoryScreen(
-    coursesHistoryViewModel: CourseHistoryViewModel = viewModel(),
     navController: NavHostController
 ) {
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
     val context = LocalContext.current
 
-    coursesHistoryViewModel.initSharedPreferences(context)
-    val coursesList = coursesHistoryViewModel.coursesMutableStateList
+    val courseViewModel = CourseViewModel(context)
+    val coursesList = courseViewModel.getCourses()
 
     Scaffold(
         scaffoldState = scaffoldState,
