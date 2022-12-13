@@ -31,41 +31,37 @@ fun CourseCardGreen(
     val mainButtonColor = ButtonDefaults.buttonColors(
         backgroundColor = greenColor,
     )
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        elevation = 10.dp,
+        border = BorderStroke(3.dp, greenColor),
+        modifier = Modifier.padding(10.dp)
     ) {
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            elevation = 10.dp,
-            border = BorderStroke(3.dp, greenColor),
-            modifier = Modifier.padding(10.dp)
-        ) {
 
-            Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)){
-                Text(text = "Corrida", fontSize = 20.sp)
-                Text(text = "Finalizada em $courseFinishDateAsString", fontSize = 14.sp, color = greenColor)
-                Text(text = "De: $courseStartAddress", fontSize = 14.sp)
-                Text(text = "Para: $courseDestinationAddress", fontSize = 14.sp)
+        Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)){
+            Text(text = "Corrida", fontSize = 20.sp)
+            Text(text = "Finalizada em $courseFinishDateAsString", fontSize = 14.sp, color = greenColor)
+            Text(text = "De: $courseStartAddress", fontSize = 14.sp)
+            Text(text = "Para: $courseDestinationAddress", fontSize = 14.sp)
 
-                Button(
-                    colors = mainButtonColor,
-                    shape = RoundedCornerShape(50),
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .align(Alignment.CenterHorizontally)
+            Button(
+                colors = mainButtonColor,
+                shape = RoundedCornerShape(50),
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .align(Alignment.CenterHorizontally)
+            )
+            {
+                Text(
+                    text = "GERAR RELATÓRIO",
+                    fontSize = 12.sp,
+                    color = Color.White
                 )
-                {
-                    Text(
-                        text = "GERAR RELATÓRIO",
-                        fontSize = 12.sp,
-                        color = Color.White
-                    )
-                }
             }
         }
     }
-
 }
 
 
@@ -86,38 +82,36 @@ fun CourseCardOrange(
         backgroundColor = orangeColor,
     )
 
-    Column() {
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            elevation = 10.dp,
-            border = BorderStroke(3.dp, orangeColor),
-            modifier = Modifier.padding(10.dp)
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        elevation = 10.dp,
+        border = BorderStroke(3.dp, orangeColor),
+        modifier = Modifier.padding(10.dp)
+    ) {
+
+        Column(
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
+            Text(text = "Corrida - Fadiga detectada", fontSize = 20.sp)
+            Text(text = "Finalizada em $courseFinishDateAsString", fontSize = 14.sp, color = orangeColor)
+            Text(text = "De: $courseStartAddress", fontSize = 14.sp)
+            Text(text = "Para: $courseDestinationAddress", fontSize = 14.sp)
 
-            Column(
-                modifier = Modifier.padding(10.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(text = "Corrida - Fadiga detectada", fontSize = 20.sp)
-                Text(text = "Finalizada em $courseFinishDateAsString", fontSize = 14.sp, color = orangeColor)
-                Text(text = "De: $courseStartAddress", fontSize = 14.sp)
-                Text(text = "Para: $courseDestinationAddress", fontSize = 14.sp)
-
-                Button(
-                    colors = mainButtonColor,
-                    shape = RoundedCornerShape(50),
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .align(Alignment.CenterHorizontally)
+            Button(
+                colors = mainButtonColor,
+                shape = RoundedCornerShape(50),
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .align(Alignment.CenterHorizontally)
+            )
+            {
+                Text(
+                    text = "GERAR RELATÓRIO",
+                    fontSize = 12.sp,
+                    color = Color.White
                 )
-                {
-                    Text(
-                        text = "GERAR RELATÓRIO",
-                        fontSize = 12.sp,
-                        color = Color.White
-                    )
-                }
             }
         }
     }
