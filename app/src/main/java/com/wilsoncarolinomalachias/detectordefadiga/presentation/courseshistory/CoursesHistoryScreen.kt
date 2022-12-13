@@ -30,7 +30,8 @@ fun CoursesHistoryScreen(
     val context = LocalContext.current
 
     val courseViewModel = CourseViewModel(context)
-    val coursesList = courseViewModel.getCourses()
+
+    val coursesList = courseViewModel.coursesLiveData.observeAsState()
 
     Scaffold(
         scaffoldState = scaffoldState,

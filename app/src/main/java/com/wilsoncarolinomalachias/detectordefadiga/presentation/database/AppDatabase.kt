@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.dao.CourseDao
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.entities.Course
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.utils.DateConverter
 
 @Database(entities = [Course::class], version = 1)
+@TypeConverters(DateConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun courseDao(): CourseDao
 
@@ -23,7 +26,7 @@ abstract class AppDatabase : RoomDatabase() {
 
             synchronized(this) {
                 val instance = Room.databaseBuilder(
-                    context,
+                    context.applicationContext,
                     AppDatabase::class.java,
                     "database-course"
                 ).build()
