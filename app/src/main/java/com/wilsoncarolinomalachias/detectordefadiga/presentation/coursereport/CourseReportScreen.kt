@@ -1,7 +1,6 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
@@ -46,10 +45,15 @@ fun CourseReportScreen(
         },
         floatingActionButtonPosition = FabPosition.End,
         content = {
-            ReportCard(
-                "Rua João de Paula, Sagrada F. - Belo Horizonte",
-                "Belo Vale = MG"
-            )
+            Box(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                ReportCard(
+                    courseStartAddress = "Rua João de Paula, Sagrada F. - Belo Horizonte",
+                    courseDestinationAddress = "Belo Vale = MG",
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     )
 }

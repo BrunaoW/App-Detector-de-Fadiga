@@ -22,42 +22,61 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.Detect
 @Composable
 fun ReportCard(
     courseStartAddress: String,
-    courseDestinationAddress: String
+    courseDestinationAddress: String,
+    modifier: Modifier = Modifier
 ) {
 
     val brownColor = Color(0xFF734D15)
-    val visitedAddresses = listOf<String>()
+    val visitedAddresses = listOf<String>(
+        "Belo horizonte",
+        "Santa luzia",
+        "Divinópolis",
+        "Cidade B",
+        "Cidade X",
+        "Cidade Y",
+        "Cidade Z",
+    )
     
     Card(
         shape = RoundedCornerShape(0.dp),
         elevation = 2.dp,
+        modifier = modifier
     ) {
-        Column {
-            Text(
-                text = "Corrida (Fadiga detectada)",
-                fontSize = 20.sp,
-                color = brownColor
-            )
-
-            Text(
-                text = "De: $courseStartAddress",
-                fontSize = 14.sp
-            )
-
-            Text(
-                text = "Para: $courseDestinationAddress",
-                fontSize = 14.sp
-            )
-        }
 
         ConstraintLayout(
             modifier = Modifier.padding(10.dp)
         ) {
-            val (timelineRef,textRef) = createRefs()
+            val (headerRef, timelineRef, addressRef) = createRefs()
+
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .constrainAs(headerRef) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }
+            ) {
+                Text(
+                    text = "Corrida (Fadiga detectada)",
+                    fontSize = 20.sp,
+                    color = brownColor
+                )
+
+                Text(
+                    text = "De: $courseStartAddress",
+                    fontSize = 14.sp
+                )
+
+                Text(
+                    text = "Para: $courseDestinationAddress",
+                    fontSize = 14.sp
+                )
+            }
+
             Spacer(
                 modifier = Modifier
                     .constrainAs(timelineRef) {
-                        top.linkTo(parent.top)
+                        top.linkTo(headerRef.bottom)
                         bottom.linkTo(parent.bottom)
                         start.linkTo(parent.start, 10.dp)
                         height = Dimension.fillToConstraints
@@ -66,12 +85,14 @@ fun ReportCard(
                     .width(2.dp)
             )
             LazyColumn(
-                modifier = Modifier.constrainAs(textRef) {
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-                start.linkTo(timelineRef.start,10.dp)
-                end.linkTo(parent.end)
-            }) {
+                modifier = Modifier
+                    .constrainAs(addressRef) {
+                    top.linkTo(headerRef.bottom)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(timelineRef.start,10.dp)
+                },
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 items(visitedAddresses) { address ->
                     Text(address, fontSize = 14.sp)
                 }
