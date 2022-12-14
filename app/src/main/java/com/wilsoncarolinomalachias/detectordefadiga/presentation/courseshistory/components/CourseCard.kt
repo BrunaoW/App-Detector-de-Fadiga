@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,8 +19,8 @@ import java.util.*
 @Composable
 fun CourseCardGreen(
     courseFinishDate: Date,
-    courseStartAddress: String,
-    courseDestinationAddress: String,
+    courseStartAddress: String?,
+    courseDestinationAddress: String?,
     modifier: Modifier = Modifier,
     onClickViewReport: () -> Unit = {}
 ) {
@@ -48,8 +49,12 @@ fun CourseCardGreen(
         ){
             Text(text = "Corrida", fontSize = 20.sp)
             Text(text = "Finalizada em $courseFinishDateAsString", fontSize = 14.sp, color = greenColor)
-            Text(text = "De: $courseStartAddress", fontSize = 14.sp)
-            Text(text = "Para: $courseDestinationAddress", fontSize = 14.sp)
+            if (!courseStartAddress.isNullOrEmpty()) {
+                Text(text = "De: $courseStartAddress", fontSize = 14.sp)
+            }
+            if (!courseDestinationAddress.isNullOrEmpty()) {
+                Text(text = "Para: $courseDestinationAddress", fontSize = 14.sp)
+            }
 
             Button(
                 colors = mainButtonColor,
@@ -76,8 +81,8 @@ fun CourseCardGreen(
 @Composable
 fun CourseCardOrange(
     courseFinishDate: Date,
-    courseStartAddress: String,
-    courseDestinationAddress: String,
+    courseStartAddress: String?,
+    courseDestinationAddress: String?,
     modifier: Modifier = Modifier,
     onClickViewReport: () -> Unit = {}
 ) {
@@ -106,8 +111,18 @@ fun CourseCardOrange(
         ) {
             Text(text = "Corrida - Fadiga detectada", fontSize = 20.sp)
             Text(text = "Finalizada em $courseFinishDateAsString", fontSize = 14.sp, color = orangeColor)
-            Text(text = "De: $courseStartAddress", fontSize = 14.sp)
-            Text(text = "Para: $courseDestinationAddress", fontSize = 14.sp)
+            if (!courseStartAddress.isNullOrEmpty()) {
+                Row {
+                    Text(text = "De: ", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(text = courseStartAddress, fontSize = 14.sp)
+                }
+            }
+            if (!courseDestinationAddress.isNullOrEmpty()) {
+                Row {
+                    Text(text = "Para: ", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(text = courseDestinationAddress, fontSize = 14.sp)
+                }
+            }
 
             Button(
                 colors = mainButtonColor,
