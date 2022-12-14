@@ -3,6 +3,8 @@ buildscript {
         compose_version = '1.1.1'
         mlkitVersion = '16.1.5'
         camerax_version = "1.1.0"
+        room_version = "2.4.1"
+        accompanist_version = '0.23.1'
     }
     repositories {
         google()
