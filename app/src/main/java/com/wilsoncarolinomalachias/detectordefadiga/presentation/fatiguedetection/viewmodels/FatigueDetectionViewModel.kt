@@ -73,6 +73,21 @@ class FatigueDetectionViewModel : ViewModel() {
         }
     }
 
+    private val yawnTimer = object : CountDownTimer(6000, 6000) {
+        var isCountingTime: Boolean = false
+
+        override fun onTick(millisUntilFinished: Long) { }
+
+        override fun onFinish() {
+            isCountingTime = false
+
+            if (isEyesCurrentlyClosed) {
+                isYawnOccuring = true
+                notifyFatigue()
+            }
+        }
+    }
+
     private val closedEyesTimer = object : CountDownTimer(1_500, 1_500) {
         var isCountingTime: Boolean = false
 
@@ -194,7 +209,7 @@ class FatigueDetectionViewModel : ViewModel() {
     }
 
     private fun detectMultipleYawnsInShortSpan(face: Face) {
-        // Detectar se boca abriu e ficou por pelo menos 2 segundos
+        // Detectar se boca abriu
         val upperLipBottom = face.getContour(FaceContour.UPPER_LIP_BOTTOM)
         val lowerLipTop = face.getContour(FaceContour.LOWER_LIP_TOP)
 
@@ -209,25 +224,34 @@ class FatigueDetectionViewModel : ViewModel() {
         val sumPercentDiff = uppperLipBottomPositionSum / lowerLipTopPositionSum
         val actualTime = Date()
 
-        // Fazer uma contagem de bocejos:
-        // Caso tenha bocejado 2 vezes em um tempo de 1 minuto, enviar evento de fadiga
-        if (sumPercentDiff < 0.99 && isEyesCurrentlyClosed && !isYawnOccuring) {
-            isYawnOccuring = true
-            yawnAndTimeOccured.add(actualTime.time)
-        } else if (sumPercentDiff >= 0.99 || !isEyesCurrentlyClosed) {
+
+        if (sumPercentDiff < 0.99 && !isYawnOccuring) {
+            if (!yawnTimer.isCountingTime) {
+                yawnTimer.start()
+                yawnTimer.isCountingTime = true
+                yawnAndTimeOccured.add(actualTime.time)
+            } else {
+                yawnTimer.cancel()
+                yawnTimer.isCountingTime = false
+            }
+        } else {
             isYawnOccuring = false
         }
 
-        if (isYawnOccuring)
-            return
+        // Fazer uma contagem de bocejos:
+        // Caso tenha bocejado 2 vezes em um tempo de 1 minuto, enviar evento de fadiga
+//        if (sumPercentDiff < 0.99 && isEyesCurrentlyClosed && !isYawnOccuring) {
+//            isYawnOccuring = true
+//            yawnAndTimeOccured.add(actualTime.time)
+//        } else if (sumPercentDiff >= 0.99 || !isEyesCurrentlyClosed) {
+//            isYawnOccuring = false
+//        }
+//
+//        val yawnsHappenedInLastMinute = yawnAndTimeOccured.count {
+//            (it - actualTime.time) < 60
+//        }
 
-        val yawnsHappenedInLastMinute = yawnAndTimeOccured.count {
-            (it - actualTime.time) < 60
-        }
 
-        if (yawnsHappenedInLastMinute > 2 && !fatigueAlarmTimer.isRunningAlarm) {
-            notifyFatigue()
-        }
     }
 
     private fun detectEyesClosedForTooLong(face: Face) {
