@@ -279,7 +279,7 @@ class FatigueDetectionViewModel : ViewModel() {
                     addressAndTimeList.add(Pair(Date().time, addressString))
                 }
 
-                delay(5_000)
+                delay(60_000)
             }
         }
     }
