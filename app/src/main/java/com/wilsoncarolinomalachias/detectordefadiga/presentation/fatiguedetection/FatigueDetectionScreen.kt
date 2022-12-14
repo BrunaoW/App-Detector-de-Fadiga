@@ -57,6 +57,7 @@ fun FatigueDetectionScreen(
     val context = LocalContext.current
 
     val courseViewModel = CourseViewModel(context)
+    fatigueDetectionViewModel.initLocationClient(context)
 
     LaunchedEffect(Unit) {
         while (true) {

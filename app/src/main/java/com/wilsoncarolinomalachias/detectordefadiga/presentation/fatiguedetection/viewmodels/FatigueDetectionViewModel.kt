@@ -14,6 +14,8 @@ import androidx.camera.core.Preview.SurfaceProvider
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceContour
@@ -28,6 +30,8 @@ import java.util.*
 class FatigueDetectionViewModel : ViewModel() {
 
     var fatigueDetectedCount: Int = 0
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     val realTimeOpts = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -96,6 +100,10 @@ class FatigueDetectionViewModel : ViewModel() {
             .setTargetResolution(Size(dimensionX, dimensionY))
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
+    }
+
+    fun initLocationClient(context: Context) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     }
     
     fun initAnalyzer(context: Context, processImageCallback: (List<PointF>) -> Unit) {
