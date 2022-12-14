@@ -1,10 +1,6 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components
 
-import android.os.Bundle
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
@@ -18,13 +14,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.viewmodels.CourseHistoryViewModel
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.entities.Course
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
 
@@ -55,7 +47,7 @@ fun CoursesHistoryScreen(
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
                 },
-                backgroundColor = Color(0xFF001CBB),
+                backgroundColor = Color.Blue,
                 contentColor = Color.White
             )
         },
@@ -63,7 +55,6 @@ fun CoursesHistoryScreen(
         content = {
             LazyColumn (
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally)
@@ -74,7 +65,9 @@ fun CoursesHistoryScreen(
                         onTextChange = {},
                         onCloseClicked = {},
                         onSearchClicked = {},
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .padding(horizontal = 16.dp)
                     )
                 }
 
@@ -88,7 +81,9 @@ fun CoursesHistoryScreen(
                                 navController.navigate(
                                     Screen.CourseReport.route
                                 )
-                            }
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
                         )
                     } else {
                         CourseCardGreen(
@@ -99,9 +94,17 @@ fun CoursesHistoryScreen(
                                 navController.navigate(
                                     Screen.CourseReport.route
                                 )
-                            }
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
                         )
                     }
+                }
+
+                item {
+                    Spacer(
+                        modifier = Modifier.height(16.dp)
+                    )
                 }
             }
         },

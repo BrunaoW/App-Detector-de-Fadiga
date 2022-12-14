@@ -20,6 +20,7 @@ fun CourseCardGreen(
     courseFinishDate: Date,
     courseStartAddress: String,
     courseDestinationAddress: String,
+    modifier: Modifier = Modifier,
     onClickViewReport: () -> Unit = {}
 ) {
     val courseFinishDateAsString =  SimpleDateFormat(
@@ -37,7 +38,7 @@ fun CourseCardGreen(
         shape = RoundedCornerShape(16.dp),
         elevation = 8.dp,
         border = BorderStroke(3.dp, greenColor),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
     ) {
 
@@ -77,6 +78,7 @@ fun CourseCardOrange(
     courseFinishDate: Date,
     courseStartAddress: String,
     courseDestinationAddress: String,
+    modifier: Modifier = Modifier,
     onClickViewReport: () -> Unit = {}
 ) {
     val courseFinishDateAsString =  SimpleDateFormat(
@@ -94,7 +96,7 @@ fun CourseCardOrange(
         shape = RoundedCornerShape(16.dp),
         elevation = 8.dp,
         border = BorderStroke(3.dp, orangeColor),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
     ) {
 
@@ -135,7 +137,9 @@ fun OrangeCourseCardPreview() {
         CourseCardOrange(
             Date(),
             "Rua João de Paula, Sagrada F. - Belo Horizonte",
-            "Belo Vale = MG"
+            "Belo Vale = MG",
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
         )
     }
 }
