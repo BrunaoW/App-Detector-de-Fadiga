@@ -1,9 +1,11 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport
 
+import android.content.Context
+import android.content.Intent
+import android.provider.MediaStore
+import android.view.View
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -13,12 +15,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.utils.ImageUtils
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
+
 
 @Composable
 fun CourseReportScreen(
@@ -27,6 +31,7 @@ fun CourseReportScreen(
 ) {
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
     val context = LocalContext.current
+    val view = LocalView.current
 
     val courseIdAsInt = courseId.toIntOrNull()
     val courseViewModel = CourseViewModel(context)
@@ -70,7 +75,9 @@ fun CourseReportScreen(
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { /* ... */ },
+                onClick = {
+                    captureViewAndShare(context, view)
+                },
                 icon = {
                     Icon(
                         Icons.Filled.ArrowDropDown,
@@ -95,6 +102,17 @@ fun CourseReportScreen(
             )
         }
     )
+}
+
+fun captureViewAndShare(context: Context, view: View) {
+    val bitmap = ImageUtils.generateBitmap(view)
+    val share = Intent(Intent.ACTION_SEND)
+    val uri = MediaStore.Images.Media.insertImage(context.getContentResolver(),
+        bitmap, "Relatorio - Corrida", null)
+    share.type = "image/*"
+    share.putExtra(Intent.EXTRA_STREAM, uri)
+    share.putExtra(Intent.EXTRA_TEXT, "PDF do relatório!")
+    context.startActivity(Intent.createChooser(share, "PDF do relatório!"))
 }
 
 @Preview

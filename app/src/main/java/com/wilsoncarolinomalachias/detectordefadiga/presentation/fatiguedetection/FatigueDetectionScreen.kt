@@ -156,7 +156,7 @@ fun FatigueDetectionScreen(
                         .build()
 
                     navController.navigate(
-                        "${Screen.CourseReport.route}/${generatedCourse.uid}",
+                        Screen.CoursesHistory.route,
                         navOptions,
                         null
                     )

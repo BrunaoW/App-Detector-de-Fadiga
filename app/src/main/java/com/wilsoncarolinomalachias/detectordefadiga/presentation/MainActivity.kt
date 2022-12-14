@@ -104,6 +104,21 @@ class MainActivity : ComponentActivity() {
         return false
     }
 
+    fun checkStoragePermission(): Boolean {
+        if (ContextCompat.checkSelfPermission(baseContext, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(baseContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
+            REQUEST_CODE_PERMISSIONS
+        )
+
+        return false
+    }
+
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
