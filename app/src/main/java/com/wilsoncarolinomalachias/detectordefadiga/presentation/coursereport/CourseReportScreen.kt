@@ -9,51 +9,43 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport.viewmodels.CourseReportViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun CourseReportScreen(
     navController: NavHostController,
-    courseId: String,
-    courseReportViewModel: CourseReportViewModel = viewModel()
+    courseId: String
 ) {
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     val courseIdAsInt = courseId.toIntOrNull()
     val courseViewModel = CourseViewModel(context)
 
     if (courseIdAsInt == null) {
         Toast
-            .makeText(context, "Id de curso inválido", Toast.LENGTH_LONG)
+            .makeText(context, "Id de corrida inválido", Toast.LENGTH_LONG)
             .show()
-        navController.navigate(Screen.StartCourseScreen.route)
-        return
+        navController.popBackStack()
     }
 
-    val loadedCourse = courseReportViewModel.loadedCourse.value
+    val coursesList = courseViewModel.coursesLiveData.observeAsState()
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val course = courseViewModel.getCourse(courseIdAsInt).first()
-            courseReportViewModel.setLoadedCourse(course)
-        }
-    }
+//    if (loadedCourse == null) {
+//        Toast
+//            .makeText(context, "Corrida inválida", Toast.LENGTH_LONG)
+//            .show()
+//        navController.popBackStack()
+//    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -71,7 +63,7 @@ fun CourseReportScreen(
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
                 },
-                backgroundColor = Color(0xFF001CBB),
+                backgroundColor = Color.Blue,
                 contentColor = Color.White
             )
         },
@@ -92,16 +84,15 @@ fun CourseReportScreen(
         },
 
         content = {
-            Box(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                ReportCard(
-                    courseStartAddress = loadedCourse?.startAddress.orEmpty(),
-                    courseDestinationAddress = loadedCourse?.destinationAddress.orEmpty(),
-                    courseEvents = loadedCourse?.eventsWithTimeList ?: arrayListOf(),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            val course = coursesList.value?.firstOrNull { it.uid == courseIdAsInt }
+
+            ReportCard(
+                courseStartAddress = course?.startAddress.orEmpty(),
+                courseDestinationAddress = course?.destinationAddress.orEmpty(),
+                hasFatigue = (course?.fatigueCount ?: 0) > 0,
+                courseEvents = course?.eventsWithTimeList ?: arrayListOf(),
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     )
 }
