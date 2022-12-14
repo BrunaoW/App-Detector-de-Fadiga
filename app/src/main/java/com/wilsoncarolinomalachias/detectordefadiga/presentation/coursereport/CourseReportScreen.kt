@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components.CoursesHistoryScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
 
 @Composable
@@ -65,9 +66,27 @@ fun CourseReportScreen(
                 ReportCard(
                     courseStartAddress = "Rua João de Paula, Sagrada F. - Belo Horizonte",
                     courseDestinationAddress = "Belo Vale = MG",
+                    listOf<String>(
+                        "Belo horizonte",
+                        "Santa luzia",
+                        "Divinópolis",
+                        "Cidade B",
+                        "Cidade X",
+                        "Cidade Y",
+                        "Cidade Z",
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         }
     )
+}
+
+@Preview
+@Composable
+fun CoursesReportPreview() {
+    val navController = rememberNavController()
+    DetectorDeFadigaTheme {
+        CourseReportScreen(navController = navController)
+    }
 }

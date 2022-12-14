@@ -23,19 +23,11 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.Detect
 fun ReportCard(
     courseStartAddress: String,
     courseDestinationAddress: String,
+    courseCities: List<String>,
     modifier: Modifier = Modifier
 ) {
 
     val brownColor = Color(0xFF734D15)
-    val visitedAddresses = listOf<String>(
-        "Belo horizonte",
-        "Santa luzia",
-        "Divinópolis",
-        "Cidade B",
-        "Cidade X",
-        "Cidade Y",
-        "Cidade Z",
-    )
     
     Card(
         shape = RoundedCornerShape(0.dp),
@@ -93,19 +85,8 @@ fun ReportCard(
                 },
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(visitedAddresses) { address ->
+                items(courseCities) { address ->
                     val (indicatorRef, addressRef) = createRefs()
-
-                    Icon(
-                        Icons.Rounded.LocationOn,
-                        contentDescription = "Localized description",
-                        tint = Color.Blue,
-                        modifier = Modifier
-                            .constrainAs(indicatorRef) {
-                                start.linkTo(timelineRef.start)
-                                end.linkTo(timelineRef.end)
-                            }
-                    )
 
                     Text(
                         address,
@@ -128,7 +109,16 @@ fun GreenCourseCardPreview() {
     DetectorDeFadigaTheme {
         ReportCard(
             "Rua João de Paula, Sagrada F. - Belo Horizonte",
-            "Belo Vale = MG"
+            "Belo Vale = MG",
+            listOf<String>(
+            "Belo horizonte",
+            "Santa luzia",
+            "Divinópolis",
+            "Cidade B",
+            "Cidade X",
+            "Cidade Y",
+            "Cidade Z",
+        )
         )
     }
 }
