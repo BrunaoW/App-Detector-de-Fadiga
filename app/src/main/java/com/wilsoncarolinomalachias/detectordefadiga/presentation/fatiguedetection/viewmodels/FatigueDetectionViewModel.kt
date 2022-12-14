@@ -247,12 +247,15 @@ class FatigueDetectionViewModel : ViewModel() {
         val startAddress = addressAndTimeList.firstOrNull()?.second
         val finalAddress = addressAndTimeList.lastOrNull()?.second ?: startAddress
 
+        val placesVisited = ArrayList(addressAndTimeList.map { it.second })
+
         val course = Course(
             uid = 0,
             startDate = Date(),
             finishDate = Date(),
             startAddress = startAddress,
             destinationAddress = finalAddress,
+            placesVisited = placesVisited,
             fatigueCount = fatigueDetectedCount
         )
 
@@ -276,7 +279,7 @@ class FatigueDetectionViewModel : ViewModel() {
                     addressAndTimeList.add(Pair(Date().time, addressString))
                 }
 
-                delay(60_000)
+                delay(5_000)
             }
         }
     }

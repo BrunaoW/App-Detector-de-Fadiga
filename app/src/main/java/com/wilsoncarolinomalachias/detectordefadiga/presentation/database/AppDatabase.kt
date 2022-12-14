@@ -7,10 +7,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.dao.CourseDao
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.entities.Course
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.utils.ArrayListConverter
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.utils.DateConverter
 
-@Database(entities = [Course::class], version = 2)
-@TypeConverters(DateConverter::class)
+@Database(entities = [Course::class], version = 3)
+@TypeConverters(DateConverter::class, ArrayListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun courseDao(): CourseDao
 
