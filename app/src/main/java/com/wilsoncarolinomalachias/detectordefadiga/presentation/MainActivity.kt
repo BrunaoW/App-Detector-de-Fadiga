@@ -14,6 +14,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
@@ -29,6 +30,8 @@ class MainActivity : ComponentActivity() {
             val systemUiController = rememberSystemUiController()
             systemUiController.setSystemBarsColor(color = Color.Blue)
 
+            val context = LocalContext.current
+
             DetectorDeFadigaTheme {
                 Surface(
                     modifier = Modifier
@@ -42,7 +45,11 @@ class MainActivity : ComponentActivity() {
                             BottomNav(navController = navController)
                         },
                         content = {
-                            NavigationGraph(navController = navController, modifier = Modifier.padding(it))
+                            NavigationGraph(
+                                navController = navController,
+                                context = context,
+                                modifier = Modifier.padding(it)
+                            )
                         }
                     )
                 }
@@ -91,6 +98,21 @@ class MainActivity : ComponentActivity() {
         ActivityCompat.requestPermissions(
             this,
             arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+            REQUEST_CODE_PERMISSIONS
+        )
+
+        return false
+    }
+
+    fun checkStoragePermission(): Boolean {
+        if (ContextCompat.checkSelfPermission(baseContext, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(baseContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
             REQUEST_CODE_PERMISSIONS
         )
 

@@ -10,7 +10,7 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.entities.Course
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.utils.EventListConverter
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.utils.DateConverter
 
-@Database(entities = [Course::class], version = 4)
+@Database(entities = [Course::class], version = 5)
 @TypeConverters(DateConverter::class, EventListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun courseDao(): CourseDao

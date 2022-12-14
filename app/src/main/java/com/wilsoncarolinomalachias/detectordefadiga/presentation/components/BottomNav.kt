@@ -19,7 +19,6 @@ fun BottomNav(
     val screens = Screen.getAllScreens()
     val mainNavigationScreenList = listOf(
         Screen.StartCourseScreen,
-        Screen.UserProfile,
         Screen.CoursesHistory
     )
 

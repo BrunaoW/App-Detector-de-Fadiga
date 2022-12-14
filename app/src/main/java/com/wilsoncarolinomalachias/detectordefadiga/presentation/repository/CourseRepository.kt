@@ -11,4 +11,8 @@ class CourseRepository(private val courseDao: CourseDao) {
     suspend fun addCourse(course: Course) {
         courseDao.insertAll(course)
     }
+
+    suspend fun getCourse(courseId: Int): List<Course> {
+        return courseDao.loadAllByIds(IntArray(courseId))
+    }
 }

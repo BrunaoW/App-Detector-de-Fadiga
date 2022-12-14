@@ -14,7 +14,7 @@ interface CourseDao {
     fun getAll(): LiveData<List<Course>>
 
     @Query("SELECT * FROM course WHERE uid IN (:courseIds)")
-    fun loadAllByIds(courseIds: IntArray): List<Course>
+    suspend fun loadAllByIds(courseIds: IntArray): List<Course>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(vararg courses: Course)

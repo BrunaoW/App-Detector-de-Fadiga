@@ -15,6 +15,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
+import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
@@ -78,8 +80,14 @@ fun CoursesHistoryScreen(
                             courseStartAddress = course.startAddress,
                             courseDestinationAddress = course.destinationAddress,
                             onClickViewReport = {
+                                val navOptions = NavOptions
+                                    .Builder()
+                                    .setPopUpTo(Screen.StartCourseScreen.route, false)
+                                    .build()
+
                                 navController.navigate(
-                                    Screen.CourseReport.route
+                                    "${Screen.CourseReport.route}/${course.uid}",
+                                    navOptions
                                 )
                             },
                             modifier = Modifier
@@ -91,8 +99,14 @@ fun CoursesHistoryScreen(
                             courseStartAddress = course.startAddress,
                             courseDestinationAddress = course.destinationAddress,
                             onClickViewReport = {
+                                val navOptions = NavOptions
+                                    .Builder()
+                                    .setPopUpTo(Screen.StartCourseScreen.route, false)
+                                    .build()
+
                                 navController.navigate(
-                                    Screen.CourseReport.route
+                                    "${Screen.CourseReport.route}/${course.uid}",
+                                    navOptions
                                 )
                             },
                             modifier = Modifier
