@@ -34,6 +34,7 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.FaceBoundsOverlay
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.FatigueDetectionViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
 import kotlinx.coroutines.delay
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
@@ -55,6 +56,8 @@ fun FatigueDetectionScreen(
     val interactionSource = remember { MutableInteractionSource() }
 
     val context = LocalContext.current
+
+    val courseViewModel = CourseViewModel(context)
 
     val isFaceNotFound = fatigueDetectionViewModel.isCurrentlyFaceNotFound
 
@@ -144,6 +147,9 @@ fun FatigueDetectionScreen(
                     indication = null
                 ) { },
             onClick = {
+                val generatedCourse = fatigueDetectionViewModel.generateCourse()
+                courseViewModel.addCourse(generatedCourse)
+
                 val navOptions = NavOptions
                     .Builder()
                     .setPopUpTo(Screen.StartCourseScreen.route, false)
@@ -209,7 +215,7 @@ private fun setupFatigueDetection(
         rootView.width,
         rootView.height
     )
-    fatigueDetectionViewModel.initAnalyzer(context) {
+    fatigueDetectionViewModel.initFatigueDetectionRoutine(context) {
         faceBoundsOverlay.drawFaceBounds(it)
     }
     fatigueDetectionViewModel.setCameraProvider(lifecycleOwner, context)

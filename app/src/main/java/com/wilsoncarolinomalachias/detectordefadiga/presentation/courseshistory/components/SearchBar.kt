@@ -22,14 +22,16 @@ fun SearchAppBar(
     onTextChange: (String) -> Unit,
     onCloseClicked: () -> Unit,
     onSearchClicked: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth(0.93f),
+        modifier = modifier
+            .fillMaxWidth(),
         color = Color.White
     ) {
-        TextField(modifier = Modifier
-            .fillMaxWidth(0.8f),
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth(0.9f),
             value = text,
             onValueChange = {
                 onTextChange(it)
