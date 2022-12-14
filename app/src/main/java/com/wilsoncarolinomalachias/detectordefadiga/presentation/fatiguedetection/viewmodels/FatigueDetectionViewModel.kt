@@ -208,10 +208,10 @@ class FatigueDetectionViewModel : ViewModel() {
 
         // Fazer uma contagem de bocejos:
         // Caso tenha bocejado 2 vezes em um tempo de 1 minuto, enviar evento de fadiga
-        if (sumPercentDiff < 0.99 && !isYawnOccuring) {
+        if (sumPercentDiff < 0.99 && isEyesCurrentlyClosed && !isYawnOccuring) {
             isYawnOccuring = true
             yawnAndTimeOccured.add(actualTime.time)
-        } else if (sumPercentDiff >= 0.99) {
+        } else if (sumPercentDiff >= 0.99 || !isEyesCurrentlyClosed) {
             isYawnOccuring = false
         }
 
