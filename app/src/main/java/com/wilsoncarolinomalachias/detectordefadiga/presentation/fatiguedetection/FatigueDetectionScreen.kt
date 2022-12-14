@@ -149,18 +149,18 @@ fun FatigueDetectionScreen(
             onClick = {
                 fatigueDetectionViewModel.generateCourse(context) { generatedCourse ->
                     courseViewModel.addCourse(generatedCourse)
+
+                    val navOptions = NavOptions
+                        .Builder()
+                        .setPopUpTo(Screen.StartCourseScreen.route, false)
+                        .build()
+
+                    navController.navigate(
+                        "${Screen.CourseReport.route}/${generatedCourse.uid}",
+                        navOptions,
+                        null
+                    )
                 }
-
-                val navOptions = NavOptions
-                    .Builder()
-                    .setPopUpTo(Screen.StartCourseScreen.route, false)
-                    .build()
-
-                navController.navigate(
-                    Screen.CourseReport.route,
-                    navOptions,
-                    null
-                )
             },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Blue,

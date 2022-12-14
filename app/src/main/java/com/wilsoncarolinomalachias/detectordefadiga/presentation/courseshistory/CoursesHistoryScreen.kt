@@ -79,7 +79,7 @@ fun CoursesHistoryScreen(
                             courseDestinationAddress = course.destinationAddress,
                             onClickViewReport = {
                                 navController.navigate(
-                                    Screen.CourseReport.route
+                                    "${Screen.CourseReport.route}/${course.uid}"
                                 )
                             },
                             modifier = Modifier
@@ -92,7 +92,7 @@ fun CoursesHistoryScreen(
                             courseDestinationAddress = course.destinationAddress,
                             onClickViewReport = {
                                 navController.navigate(
-                                    Screen.CourseReport.route
+                                    "${Screen.CourseReport.route}/${course.uid}"
                                 )
                             },
                             modifier = Modifier

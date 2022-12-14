@@ -6,10 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,12 +15,15 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Composable
 fun ReportCard(
     courseStartAddress: String,
     courseDestinationAddress: String,
-    courseCities: List<String>,
+    courseEvents: ArrayList<Pair<Long, String>>,
     modifier: Modifier = Modifier
 ) {
 
@@ -85,11 +85,15 @@ fun ReportCard(
                 },
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(courseCities) { address ->
+                items(courseEvents) { event ->
                     val (indicatorRef, addressRef) = createRefs()
+                    val eventDate = SimpleDateFormat(
+                        "yyyy-MM-dd HH:mm",
+                        Locale.getDefault()
+                    ).format(event.first)
 
                     Text(
-                        address,
+                        "$eventDate - ${event.second}",
                         fontSize = 14.sp,
                         modifier = Modifier
                             .constrainAs(addressRef) {
@@ -110,15 +114,7 @@ fun GreenCourseCardPreview() {
         ReportCard(
             "Rua João de Paula, Sagrada F. - Belo Horizonte",
             "Belo Vale = MG",
-            listOf<String>(
-            "Belo horizonte",
-            "Santa luzia",
-            "Divinópolis",
-            "Cidade B",
-            "Cidade X",
-            "Cidade Y",
-            "Cidade Z",
-        )
+            arrayListOf()
         )
     }
 }

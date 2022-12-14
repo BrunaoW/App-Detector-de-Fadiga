@@ -25,4 +25,8 @@ class CourseViewModel(context: Context): ViewModel() {
             repository.addCourse(course)
         }
     }
+
+    suspend fun getCourse(courseId: Int): List<Course> {
+        return repository.getCourse(courseId)
+    }
 }

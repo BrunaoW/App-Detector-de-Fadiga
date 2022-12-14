@@ -92,7 +92,7 @@ fun CourseCardOrange(
     modifier: Modifier = Modifier,
     onClickViewReport: () -> Unit = {}
 ) {
-    val courseFinishDateAsString =  SimpleDateFormat(
+    val courseFinishDateAsString = SimpleDateFormat(
         "yyyy-MM-dd HH:mm",
         Locale.getDefault()
     ).format(courseFinishDate)

@@ -1,5 +1,6 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -8,20 +9,51 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components.CoursesHistoryScreen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport.viewmodels.CourseReportViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun CourseReportScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    courseId: String,
+    courseReportViewModel: CourseReportViewModel = viewModel()
 ) {
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val courseIdAsInt = courseId.toIntOrNull()
+    val courseViewModel = CourseViewModel(context)
+
+    if (courseIdAsInt == null) {
+        Toast
+            .makeText(context, "Id de curso inválido", Toast.LENGTH_LONG)
+            .show()
+        navController.navigate(Screen.StartCourseScreen.route)
+        return
+    }
+
+    val loadedCourse = courseReportViewModel.loadedCourse.value
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val course = courseViewModel.getCourse(courseIdAsInt).first()
+            courseReportViewModel.setLoadedCourse(course)
+        }
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -50,7 +82,7 @@ fun CourseReportScreen(
                 icon = {
                     Icon(
                         Icons.Filled.ArrowDropDown,
-                        contentDescription = "salvar"
+                        contentDescription = "Salvar"
                     )
                 },
                 text = { Text("SALVAR EM PDF") },
@@ -64,24 +96,9 @@ fun CourseReportScreen(
                 modifier = Modifier.padding(16.dp)
             ) {
                 ReportCard(
-                    courseStartAddress = "Rua João de Paula, Sagrada F. - Belo Horizonte",
-                    courseDestinationAddress = "Belo Vale = MG",
-                    listOf<String>(
-                        "Belo horizonte",
-                        "Santa luzia",
-                        "Divinópolis",
-                        "Cidade A",
-                        "Cidade B",
-                        "Cidade C",
-                        "Cidade D",
-                        "Cidade E",
-                        "Cidade F",
-                        "Cidade G",
-                        "Cidade H",
-                        "Cidade I",
-                        "Cidade J",
-                        "Cidade K",
-                    ),
+                    courseStartAddress = loadedCourse?.startAddress.orEmpty(),
+                    courseDestinationAddress = loadedCourse?.destinationAddress.orEmpty(),
+                    courseEvents = loadedCourse?.eventsWithTimeList ?: arrayListOf(),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -94,6 +111,9 @@ fun CourseReportScreen(
 fun CoursesReportPreview() {
     val navController = rememberNavController()
     DetectorDeFadigaTheme {
-        CourseReportScreen(navController = navController)
+        CourseReportScreen(
+            navController = navController,
+            courseId = "courseId"
+        )
     }
 }
