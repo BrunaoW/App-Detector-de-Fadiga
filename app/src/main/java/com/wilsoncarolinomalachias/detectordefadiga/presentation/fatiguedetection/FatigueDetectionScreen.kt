@@ -192,7 +192,7 @@ private fun setupFatigueDetection(
         rootView.width,
         rootView.height
     )
-    fatigueDetectionViewModel.initAnalyzer(context) {
+    fatigueDetectionViewModel.initFatigueDetectionRoutine(context) {
         faceBoundsOverlay.drawFaceBounds(it)
     }
     fatigueDetectionViewModel.setCameraProvider(lifecycleOwner, context)
