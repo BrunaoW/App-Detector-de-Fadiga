@@ -2,7 +2,6 @@ package com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetecti
 
 import android.content.Context
 import android.graphics.PointF
-import android.location.Address
 import android.location.Geocoder
 import android.media.Ringtone
 import android.media.RingtoneManager
@@ -15,7 +14,6 @@ import androidx.camera.core.Preview
 import androidx.camera.core.Preview.SurfaceProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -38,7 +36,9 @@ class FatigueDetectionViewModel : ViewModel() {
     var fatigueDetectedCount: Int = 0
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val addressAndTimeList: MutableList<Pair<Long, String>> = mutableListOf()
+    private var startAddress: String = ""
+    private var finalAddress: String = ""
+    private val eventWithTimeList: MutableList<Pair<Long, String>> = mutableListOf()
 
     val realTimeOpts = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -107,6 +107,9 @@ class FatigueDetectionViewModel : ViewModel() {
         ringtoneManager.play()
         fatigueAlarmTimer.start()
         fatigueDetectedCount += 1
+
+        val fatigueTime = Date()
+        eventWithTimeList.add(Pair(fatigueTime.time, "Fadiga detectada"))
     }
 
     fun setPreviewUseCase(surfaceProvider: SurfaceProvider) {
@@ -126,7 +129,7 @@ class FatigueDetectionViewModel : ViewModel() {
 
     fun initFatigueDetectionRoutine(context: Context, processImageCallback: (List<PointF>) -> Unit) {
         initLocationClient(context)
-        initAddressesSavesInListWhileExecuting(context)
+        initAddressesSavesInListRoutine(context)
         initAnalyzer(context, processImageCallback)
     }
 
@@ -275,27 +278,36 @@ class FatigueDetectionViewModel : ViewModel() {
         )
     }
 
-    fun generateCourse(): Course {
-        val startAddress = addressAndTimeList.firstOrNull()?.second
-        val finalAddress = addressAndTimeList.lastOrNull()?.second ?: startAddress
+    fun generateCourse(context: Context, onCompletion: (course: Course) -> Unit) {
+        fusedLocationClient.lastLocation.addOnCompleteListener {
+            val currentLocation = it.result
+            val currentAddress = Geocoder(context)
+                .getFromLocation(
+                    currentLocation.latitude,
+                    currentLocation.longitude,
+                    1
+                ).firstOrNull() ?: return@addOnCompleteListener
 
-        val placesVisited = ArrayList(addressAndTimeList.map { it.second })
+            finalAddress = "${currentAddress.thoroughfare}, ${currentAddress.subLocality}, ${currentAddress.subAdminArea} - ${currentAddress.adminArea}"
 
-        val course = Course(
-            uid = 0,
-            startDate = Date(),
-            finishDate = Date(),
-            startAddress = startAddress,
-            destinationAddress = finalAddress,
-            placesVisited = placesVisited,
-            fatigueCount = fatigueDetectedCount
-        )
+            val course = Course(
+                uid = 0,
+                startDate = Date(),
+                finishDate = Date(),
+                startAddress = startAddress,
+                destinationAddress = finalAddress,
+                eventsWithTimeList = ArrayList(eventWithTimeList),
+                fatigueCount = fatigueDetectedCount
+            )
 
-        return course
+            onCompletion(course)
+        }
     }
 
-    private fun initAddressesSavesInListWhileExecuting(context: Context) {
+    private fun initAddressesSavesInListRoutine(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
+            var isFirstExecution = true
+
             while(true) {
                 fusedLocationClient.lastLocation.addOnCompleteListener {
                     val currentLocation = it.result
@@ -308,7 +320,12 @@ class FatigueDetectionViewModel : ViewModel() {
 
                     val addressString = "${currentAddress.thoroughfare}, ${currentAddress.subLocality}, ${currentAddress.subAdminArea} - ${currentAddress.adminArea}"
 
-                    addressAndTimeList.add(Pair(Date().time, addressString))
+                    eventWithTimeList.add(Pair(Date().time, addressString))
+
+                    if (isFirstExecution) {
+                        startAddress = addressString
+                        isFirstExecution = false
+                    }
                 }
 
                 delay(60_000)

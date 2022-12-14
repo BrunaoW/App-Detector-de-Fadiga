@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.utils.ArrayListConverter
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.utils.EventListConverter
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.utils.DateConverter
 import java.util.*
 import kotlin.collections.ArrayList
@@ -28,9 +28,9 @@ data class Course(
     @ColumnInfo(name = "destination_address")
     val destinationAddress: String?,
 
-    @TypeConverters(ArrayListConverter::class)
+    @TypeConverters(EventListConverter::class)
     @ColumnInfo(name = "places_visited")
-    val placesVisited: ArrayList<String>,
+    val eventsWithTimeList: ArrayList<Pair<Long, String>>,
 
     @ColumnInfo(name = "fatigue_count")
     val fatigueCount: Int = 0

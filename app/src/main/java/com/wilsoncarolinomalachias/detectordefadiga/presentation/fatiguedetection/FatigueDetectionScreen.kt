@@ -147,8 +147,9 @@ fun FatigueDetectionScreen(
                     indication = null
                 ) { },
             onClick = {
-                val generatedCourse = fatigueDetectionViewModel.generateCourse()
-                courseViewModel.addCourse(generatedCourse)
+                fatigueDetectionViewModel.generateCourse(context) { generatedCourse ->
+                    courseViewModel.addCourse(generatedCourse)
+                }
 
                 val navOptions = NavOptions
                     .Builder()
