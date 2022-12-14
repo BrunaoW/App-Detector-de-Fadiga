@@ -2,6 +2,7 @@ package com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetecti
 
 import android.content.Context
 import android.graphics.PointF
+import android.location.Geocoder
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.CountDownTimer
@@ -11,22 +12,33 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.core.Preview.SurfaceProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceContour
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.entities.Course
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.executor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.getCameraProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
 class FatigueDetectionViewModel : ViewModel() {
 
     var fatigueDetectedCount: Int = 0
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var startAddress: String = ""
+    private var finalAddress: String = ""
+    private val eventWithTimeList: MutableList<Pair<Long, String>> = mutableListOf()
 
     val realTimeOpts = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -46,7 +58,22 @@ class FatigueDetectionViewModel : ViewModel() {
     private var rightEyeClosedProbability: Float = 0f
 
     private var isEyesCurrentlyClosed: Boolean = false
-    private val closedEyesTimer = object : CountDownTimer(2000, 2000) {
+
+    var isCurrentlyFaceNotFound = mutableStateOf(false)
+        private set
+
+    private val faceNotFoundTimer = object : CountDownTimer(10_000, 10_000) {
+        var isCountingTime: Boolean = false
+
+        override fun onTick(millisUntilFinished: Long) { }
+
+        override fun onFinish() {
+            ringtoneManager.play()
+            isCurrentlyFaceNotFound.value = true
+        }
+    }
+
+    private val closedEyesTimer = object : CountDownTimer(1_500, 1_500) {
         var isCountingTime: Boolean = false
 
         override fun onTick(millisUntilFinished: Long) { }
@@ -80,6 +107,9 @@ class FatigueDetectionViewModel : ViewModel() {
         ringtoneManager.play()
         fatigueAlarmTimer.start()
         fatigueDetectedCount += 1
+
+        val fatigueTime = Date()
+        eventWithTimeList.add(Pair(fatigueTime.time, "Fadiga detectada"))
     }
 
     fun setPreviewUseCase(surfaceProvider: SurfaceProvider) {
@@ -96,8 +126,18 @@ class FatigueDetectionViewModel : ViewModel() {
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
     }
-    
-    fun initAnalyzer(context: Context, processImageCallback: (List<PointF>) -> Unit) {
+
+    fun initFatigueDetectionRoutine(context: Context, processImageCallback: (List<PointF>) -> Unit) {
+        initLocationClient(context)
+        initAddressesSavesInListRoutine(context)
+        initAnalyzer(context, processImageCallback)
+    }
+
+    private fun initLocationClient(context: Context) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    }
+
+    private fun initAnalyzer(context: Context, processImageCallback: (List<PointF>) -> Unit) {
         val executor = context.executor
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         ringtoneManager = RingtoneManager.getRingtone(context, ringtoneUri)
@@ -113,15 +153,25 @@ class FatigueDetectionViewModel : ViewModel() {
                 detector
                     .process(processImage)
                     .addOnSuccessListener { faces ->
-                        val face: Face? = faces.firstOrNull()
+                        val face = faces.firstOrNull()
 
-                        val allPoints = face?.allContours?.fold(listOf<PointF>()) { contours, contour ->
-                            contours + contour.points
-                        } ?: listOf()
+                        if (face == null) {
+                            if (!faceNotFoundTimer.isCountingTime) {
+                                faceNotFoundTimer.start()
+                                faceNotFoundTimer.isCountingTime = true
+                            }
 
-                        processImageCallback(allPoints)
-                        face?.let {
-                            processFaceFeaturesAndDetectFatigue(it, routineTimeStart)
+                            processImageCallback(listOf())
+                        } else {
+                            faceNotFoundTimer.cancel()
+                            faceNotFoundTimer.isCountingTime = false
+
+                            val allPoints = face.allContours.fold(listOf<PointF>()) { contours, contour ->
+                                contours + contour.points
+                            }
+
+                            processImageCallback(allPoints)
+                            processFaceFeaturesAndDetectFatigue(face, routineTimeStart)
                         }
 
                         imageProxy.close()
@@ -133,12 +183,17 @@ class FatigueDetectionViewModel : ViewModel() {
         }
     }
 
-    private fun processFaceFeaturesAndDetectFatigue(face: Face, routineTimeStart: Date) {
-        detectEyesClosedForTooLong(face)
-        detectMultipleYawnsInShortSpan(face, routineTimeStart)
+    fun resetIsFaceNotFound() {
+        isCurrentlyFaceNotFound.value = false
+        ringtoneManager.stop()
     }
 
-    private fun detectMultipleYawnsInShortSpan(face: Face, routineTimeStart: Date) {
+    private fun processFaceFeaturesAndDetectFatigue(face: Face, routineTimeStart: Date) {
+        detectEyesClosedForTooLong(face)
+        detectMultipleYawnsInShortSpan(face)
+    }
+
+    private fun detectMultipleYawnsInShortSpan(face: Face) {
         // Detectar se boca abriu e ficou por pelo menos 2 segundos
         val upperLipBottom = face.getContour(FaceContour.UPPER_LIP_BOTTOM)
         val lowerLipTop = face.getContour(FaceContour.LOWER_LIP_TOP)
@@ -156,10 +211,10 @@ class FatigueDetectionViewModel : ViewModel() {
 
         // Fazer uma contagem de bocejos:
         // Caso tenha bocejado 2 vezes em um tempo de 1 minuto, enviar evento de fadiga
-        if (sumPercentDiff < 0.99 && !isYawnOccuring) {
+        if (sumPercentDiff < 0.99 && isEyesCurrentlyClosed && !isYawnOccuring) {
             isYawnOccuring = true
             yawnAndTimeOccured.add(actualTime.time)
-        } else if (sumPercentDiff >= 0.99) {
+        } else if (sumPercentDiff >= 0.99 || !isEyesCurrentlyClosed) {
             isYawnOccuring = false
         }
 
@@ -199,7 +254,7 @@ class FatigueDetectionViewModel : ViewModel() {
     }
 
     fun setCameraProvider(lifecycleOwner: LifecycleOwner, context: Context) {
-        viewModelScope.launch { 
+        viewModelScope.launch {
             try {
                 val cameraProvider = context.getCameraProvider()
                 // Must unbind the use-cases before rebinding them.
@@ -223,4 +278,58 @@ class FatigueDetectionViewModel : ViewModel() {
         )
     }
 
+    fun generateCourse(context: Context, onCompletion: (course: Course) -> Unit) {
+        fusedLocationClient.lastLocation.addOnCompleteListener {
+            val currentLocation = it.result
+            val currentAddress = Geocoder(context)
+                .getFromLocation(
+                    currentLocation.latitude,
+                    currentLocation.longitude,
+                    1
+                ).firstOrNull() ?: return@addOnCompleteListener
+
+            finalAddress = "${currentAddress.thoroughfare}, ${currentAddress.subLocality}, ${currentAddress.subAdminArea} - ${currentAddress.adminArea}"
+
+            val course = Course(
+                uid = 0,
+                startDate = Date(),
+                finishDate = Date(),
+                startAddress = startAddress,
+                destinationAddress = finalAddress,
+                eventsWithTimeList = ArrayList(eventWithTimeList),
+                fatigueCount = fatigueDetectedCount
+            )
+
+            onCompletion(course)
+        }
+    }
+
+    private fun initAddressesSavesInListRoutine(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            var isFirstExecution = true
+
+            while(true) {
+                fusedLocationClient.lastLocation.addOnCompleteListener {
+                    val currentLocation = it.result
+                    val currentAddress = Geocoder(context)
+                        .getFromLocation(
+                            currentLocation.latitude,
+                            currentLocation.longitude,
+                            1
+                        ).firstOrNull() ?: return@addOnCompleteListener
+
+                    val addressString = "${currentAddress.thoroughfare}, ${currentAddress.subLocality}, ${currentAddress.subAdminArea} - ${currentAddress.adminArea}"
+
+                    eventWithTimeList.add(Pair(Date().time, addressString))
+
+                    if (isFirstExecution) {
+                        startAddress = addressString
+                        isFirstExecution = false
+                    }
+                }
+
+                delay(60_000)
+            }
+        }
+    }
 }

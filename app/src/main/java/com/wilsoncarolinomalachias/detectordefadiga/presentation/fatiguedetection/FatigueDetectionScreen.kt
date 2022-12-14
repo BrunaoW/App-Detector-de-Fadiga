@@ -12,6 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
@@ -33,6 +34,7 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.FaceBoundsOverlay
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.FatigueDetectionViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
 import kotlinx.coroutines.delay
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
@@ -55,6 +57,10 @@ fun FatigueDetectionScreen(
 
     val context = LocalContext.current
 
+    val courseViewModel = CourseViewModel(context)
+
+    val isFaceNotFound = fatigueDetectionViewModel.isCurrentlyFaceNotFound
+
     LaunchedEffect(Unit) {
         while (true) {
             delay(1.seconds)
@@ -71,6 +77,26 @@ fun FatigueDetectionScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        if (isFaceNotFound.value) {
+            AlertDialog(
+                onDismissRequest = {
+                    fatigueDetectionViewModel.resetIsFaceNotFound()
+                },
+                title = { Text(text = "Falha na captura do rosto") },
+                text = { Text("Não foi possível capturar o rosto do motorista. Verificar o motivo com urgência após parar o carro.") },
+                confirmButton = { },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            fatigueDetectionViewModel.resetIsFaceNotFound()
+                        }
+                    ) {
+                        Text("Fechar")
+                    }
+                }
+            )
+        }
+
         AndroidView(
             modifier = Modifier
                 .border(2.dp, Color.Red),
@@ -121,6 +147,10 @@ fun FatigueDetectionScreen(
                     indication = null
                 ) { },
             onClick = {
+                fatigueDetectionViewModel.generateCourse(context) { generatedCourse ->
+                    courseViewModel.addCourse(generatedCourse)
+                }
+
                 val navOptions = NavOptions
                     .Builder()
                     .setPopUpTo(Screen.StartCourseScreen.route, false)
@@ -186,7 +216,7 @@ private fun setupFatigueDetection(
         rootView.width,
         rootView.height
     )
-    fatigueDetectionViewModel.initAnalyzer(context) {
+    fatigueDetectionViewModel.initFatigueDetectionRoutine(context) {
         faceBoundsOverlay.drawFaceBounds(it)
     }
     fatigueDetectionViewModel.setCameraProvider(lifecycleOwner, context)
