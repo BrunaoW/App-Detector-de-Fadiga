@@ -73,7 +73,7 @@ class FatigueDetectionViewModel : ViewModel() {
         }
     }
 
-    private val closedEyesTimer = object : CountDownTimer(2000, 2000) {
+    private val closedEyesTimer = object : CountDownTimer(1_500, 1_500) {
         var isCountingTime: Boolean = false
 
         override fun onTick(millisUntilFinished: Long) { }
