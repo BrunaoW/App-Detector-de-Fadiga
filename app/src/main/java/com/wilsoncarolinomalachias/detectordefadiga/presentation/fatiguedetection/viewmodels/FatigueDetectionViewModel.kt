@@ -13,7 +13,9 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.core.Preview.SurfaceProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -56,7 +58,22 @@ class FatigueDetectionViewModel : ViewModel() {
     private var rightEyeClosedProbability: Float = 0f
 
     private var isEyesCurrentlyClosed: Boolean = false
-    private val closedEyesTimer = object : CountDownTimer(2000, 2000) {
+
+    var isCurrentlyFaceNotFound = mutableStateOf(false)
+        private set
+
+    private val faceNotFoundTimer = object : CountDownTimer(10_000, 10_000) {
+        var isCountingTime: Boolean = false
+
+        override fun onTick(millisUntilFinished: Long) { }
+
+        override fun onFinish() {
+            ringtoneManager.play()
+            isCurrentlyFaceNotFound.value = true
+        }
+    }
+
+    private val closedEyesTimer = object : CountDownTimer(1_500, 1_500) {
         var isCountingTime: Boolean = false
 
         override fun onTick(millisUntilFinished: Long) { }
@@ -133,15 +150,25 @@ class FatigueDetectionViewModel : ViewModel() {
                 detector
                     .process(processImage)
                     .addOnSuccessListener { faces ->
-                        val face: Face? = faces.firstOrNull()
+                        val face = faces.firstOrNull()
 
-                        val allPoints = face?.allContours?.fold(listOf<PointF>()) { contours, contour ->
-                            contours + contour.points
-                        } ?: listOf()
+                        if (face == null) {
+                            if (!faceNotFoundTimer.isCountingTime) {
+                                faceNotFoundTimer.start()
+                                faceNotFoundTimer.isCountingTime = true
+                            }
 
-                        processImageCallback(allPoints)
-                        face?.let {
-                            processFaceFeaturesAndDetectFatigue(it, routineTimeStart)
+                            processImageCallback(listOf())
+                        } else {
+                            faceNotFoundTimer.cancel()
+                            faceNotFoundTimer.isCountingTime = false
+
+                            val allPoints = face.allContours.fold(listOf<PointF>()) { contours, contour ->
+                                contours + contour.points
+                            }
+
+                            processImageCallback(allPoints)
+                            processFaceFeaturesAndDetectFatigue(face, routineTimeStart)
                         }
 
                         imageProxy.close()
@@ -151,6 +178,11 @@ class FatigueDetectionViewModel : ViewModel() {
                     }
             }
         }
+    }
+
+    fun resetIsFaceNotFound() {
+        isCurrentlyFaceNotFound.value = false
+        ringtoneManager.stop()
     }
 
     private fun processFaceFeaturesAndDetectFatigue(face: Face, routineTimeStart: Date) {
@@ -176,10 +208,10 @@ class FatigueDetectionViewModel : ViewModel() {
 
         // Fazer uma contagem de bocejos:
         // Caso tenha bocejado 2 vezes em um tempo de 1 minuto, enviar evento de fadiga
-        if (sumPercentDiff < 0.99 && !isYawnOccuring) {
+        if (sumPercentDiff < 0.99 && isEyesCurrentlyClosed && !isYawnOccuring) {
             isYawnOccuring = true
             yawnAndTimeOccured.add(actualTime.time)
-        } else if (sumPercentDiff >= 0.99) {
+        } else if (sumPercentDiff >= 0.99 || !isEyesCurrentlyClosed) {
             isYawnOccuring = false
         }
 
@@ -219,7 +251,7 @@ class FatigueDetectionViewModel : ViewModel() {
     }
 
     fun setCameraProvider(lifecycleOwner: LifecycleOwner, context: Context) {
-        viewModelScope.launch { 
+        viewModelScope.launch {
             try {
                 val cameraProvider = context.getCameraProvider()
                 // Must unbind the use-cases before rebinding them.

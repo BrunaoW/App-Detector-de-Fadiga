@@ -50,10 +50,16 @@ fun CourseCardGreen(
             Text(text = "Corrida", fontSize = 20.sp)
             Text(text = "Finalizada em $courseFinishDateAsString", fontSize = 14.sp, color = greenColor)
             if (!courseStartAddress.isNullOrEmpty()) {
-                Text(text = "De: $courseStartAddress", fontSize = 14.sp)
+                Row {
+                    Text(text = "De: ", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(text = courseStartAddress, fontSize = 14.sp)
+                }
             }
             if (!courseDestinationAddress.isNullOrEmpty()) {
-                Text(text = "Para: $courseDestinationAddress", fontSize = 14.sp)
+                Row {
+                    Text(text = "Para: ", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(text = courseDestinationAddress, fontSize = 14.sp)
+                }
             }
 
             Button(

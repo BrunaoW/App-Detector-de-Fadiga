@@ -12,6 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
@@ -58,6 +59,8 @@ fun FatigueDetectionScreen(
 
     val courseViewModel = CourseViewModel(context)
 
+    val isFaceNotFound = fatigueDetectionViewModel.isCurrentlyFaceNotFound
+
     LaunchedEffect(Unit) {
         while (true) {
             delay(1.seconds)
@@ -74,6 +77,26 @@ fun FatigueDetectionScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        if (isFaceNotFound.value) {
+            AlertDialog(
+                onDismissRequest = {
+                    fatigueDetectionViewModel.resetIsFaceNotFound()
+                },
+                title = { Text(text = "Falha na captura do rosto") },
+                text = { Text("Não foi possível capturar o rosto do motorista. Verificar o motivo com urgência após parar o carro.") },
+                confirmButton = { },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            fatigueDetectionViewModel.resetIsFaceNotFound()
+                        }
+                    ) {
+                        Text("Fechar")
+                    }
+                }
+            )
+        }
+
         AndroidView(
             modifier = Modifier
                 .border(2.dp, Color.Red),
