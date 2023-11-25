@@ -14,18 +14,23 @@ android {
         }
     }
     namespace 'com.wilsoncarolinomalachias.detectordefadiga'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.wilsoncarolinomalachias.detectordefadiga"
         minSdk 21
-        targetSdk 32
-        versionCode 2
-        versionName "1.1"
+        targetSdk 33
+        versionCode 3
+        versionName "1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
+        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
         }
     }
 
@@ -33,14 +38,24 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+    aaptOptions {
+        noCompress "tflite"
+        noCompress "fadigalert-db04b48dbd9d.json"
     }
     buildFeatures {
         compose true
@@ -53,6 +68,13 @@ android {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
+    }
+}
+
+configurations {
+    all {
+        exclude module: 'httpclient'
+        exclude module: 'commons-logging'
     }
 }
 
@@ -76,6 +98,9 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
+
+    // Serilization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
     // Compose dependencies
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
@@ -137,4 +162,25 @@ dependencies {
 
     // optional - Paging 3 Integration
     implementation "androidx.room:room-paging:2.4.1"
+
+    //Tensor Flow
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+    // Add the dependency for the Firebase ML model downloader library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-ml-modeldownloader-ktx")
+    // Also add the dependency for the TensorFlow Lite library and specify its version
+    implementation("org.tensorflow:tensorflow-lite:2.14.0")
+
+    // Tensorflow Lite dependencies
+    implementation 'org.tensorflow:tensorflow-lite-task-vision-play-services:0.4.2'
+    implementation 'com.google.android.gms:play-services-tflite-gpu:16.1.0'
+
+    // Google Auth
+    implementation 'com.google.auth:google-auth-library-oauth2-http:1.16.0'
+    implementation 'com.google.android.gms:play-services-auth:20.4.1'
+    implementation 'com.google.http-client:google-http-client-gson:1.42.3'
+    implementation 'com.google.api-client:google-api-client-android:2.2.0'
+    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.34.1'
+    implementation 'com.google.apis:google-api-services-drive:v3-rev20230212-2.0.0'
 }

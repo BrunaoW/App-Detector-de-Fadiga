@@ -1,7 +1,6 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -38,9 +37,7 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.Cour
 import kotlinx.coroutines.delay
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 @ExperimentalGetImage
 @Composable
 fun FatigueDetectionScreen(
@@ -152,7 +149,7 @@ fun FatigueDetectionScreen(
 
                     val navOptions = NavOptions
                         .Builder()
-                        .setPopUpTo(Screen.StartCourseScreen.route, false)
+                        .setPopUpTo(Screen.StartCourse.route, false)
                         .build()
 
                     navController.navigate(

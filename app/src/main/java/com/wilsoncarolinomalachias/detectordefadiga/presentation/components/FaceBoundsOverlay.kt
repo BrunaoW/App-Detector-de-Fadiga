@@ -24,12 +24,14 @@ class FaceBoundsOverlay constructor(
         color = ContextCompat.getColor(context!!, R.color.red)
         strokeWidth = 5f
     }
+    var widthScaleFactor: Float = 3.5f/4
+    var heightScaleFactor: Float = 1f
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         faceBounds.forEach {
-            val actualX = (width - (it.x * (3.5/4))).toFloat()
-            val actualY = (it.y * (3.5/4)).toFloat()
+            val actualX = (width - (it.x * widthScaleFactor))
+            val actualY = (it.y * heightScaleFactor)
 
             canvas.drawCircle(actualX, actualY, 5f, paint)
         }

@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Detector de Fadiga"
+rootProject.name = "FadigAlert"
 include ':app'

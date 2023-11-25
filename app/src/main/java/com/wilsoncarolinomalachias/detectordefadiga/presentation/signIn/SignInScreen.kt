@@ -65,7 +65,7 @@ fun SignInScreen(
         )
 
         Text(
-            text = "Detector de Fadiga",
+            text = "FadigAlert",
             style = MaterialTheme.typography.h4.copy(
                 fontWeight = FontWeight.Medium
             ),

@@ -1,6 +1,9 @@
 package com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.location.Geocoder
 import android.media.Ringtone
@@ -13,6 +16,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.core.Preview.SurfaceProvider
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -152,6 +156,7 @@ class FatigueDetectionViewModel : ViewModel() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
     private fun initAnalyzer(context: Context, processImageCallback: (List<PointF>) -> Unit) {
         val executor = context.executor
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
@@ -292,6 +297,7 @@ class FatigueDetectionViewModel : ViewModel() {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     fun updateImageViewResolution(width: Int, height: Int) {
         if (imageAnalysis.camera == null) {
             return
@@ -303,6 +309,23 @@ class FatigueDetectionViewModel : ViewModel() {
     }
 
     fun generateCourse(context: Context, onCompletion: (course: Course) -> Unit) {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
         fusedLocationClient.lastLocation.addOnCompleteListener {
             val currentLocation = it.result
             val currentAddress = Geocoder(context)
@@ -310,7 +333,7 @@ class FatigueDetectionViewModel : ViewModel() {
                     currentLocation.latitude,
                     currentLocation.longitude,
                     1
-                ).firstOrNull() ?: return@addOnCompleteListener
+                )?.firstOrNull() ?: return@addOnCompleteListener
 
             finalAddress = "${currentAddress.thoroughfare}, ${currentAddress.subLocality}, ${currentAddress.subAdminArea} - ${currentAddress.adminArea}"
 
@@ -333,6 +356,23 @@ class FatigueDetectionViewModel : ViewModel() {
             var isFirstExecution = true
 
             while(true) {
+                if (ActivityCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return@launch
+                }
                 fusedLocationClient.lastLocation.addOnCompleteListener {
                     val currentLocation = it.result
                     val currentAddress = Geocoder(context)
@@ -340,7 +380,7 @@ class FatigueDetectionViewModel : ViewModel() {
                             currentLocation.latitude,
                             currentLocation.longitude,
                             1
-                        ).firstOrNull() ?: return@addOnCompleteListener
+                        )?.firstOrNull() ?: return@addOnCompleteListener
 
                     val addressString = "${currentAddress.thoroughfare}, ${currentAddress.subLocality}, ${currentAddress.subAdminArea} - ${currentAddress.adminArea}"
 

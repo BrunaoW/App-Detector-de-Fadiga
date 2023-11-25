@@ -3,20 +3,22 @@ package com.wilsoncarolinomalachias.detectordefadiga.presentation
 import com.wilsoncarolinomalachias.detectordefadiga.R
 
 sealed class Screen(val route: String, val iconResourceId: Int? = null) {
-    object StartCourseScreen: Screen("start_course_screen", R.drawable.ic_directions_car)
+    object StartCourse: Screen("start_course_screen", R.drawable.ic_directions_car)
     object FatigueDetection: Screen("fatigue_detection_screen", R.drawable.ic_directions_car)
     object CourseReport: Screen("course_report_screen", R.drawable.ic_paper)
     object CoursesHistory: Screen("courses_history_screen", R.drawable.ic_paper)
     object UserProfile: Screen("user_profile_screen", R.drawable.ic_profile)
+    object TranslateData: Screen("translate_data", R.drawable.ic_directions_car)
 
     companion object {
         fun getAllScreens(): List<Screen> {
             return listOf(
-                StartCourseScreen,
+                StartCourse,
                 FatigueDetection,
                 CourseReport,
                 CoursesHistory,
-                UserProfile
+                UserProfile,
+                TranslateData
             )
         }
     }

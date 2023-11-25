@@ -13,8 +13,8 @@ import androidx.navigation.compose.navArgument
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport.CourseReportScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components.CoursesHistoryScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.FatigueDetectionScreen
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.signIn.SignInScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.startcourse.StartCourseScreen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.translatedata.TranslateDataScreen
 
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
@@ -25,10 +25,10 @@ fun NavigationGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.StartCourseScreen.route,
+        startDestination = Screen.StartCourse.route,
         modifier = modifier
     ) {
-        composable(route = Screen.StartCourseScreen.route) {
+        composable(route = Screen.StartCourse.route) {
             StartCourseScreen(
                 navController = navController
             )
@@ -50,7 +50,7 @@ fun NavigationGraph(
                 Toast
                     .makeText(context, "Id de curso inválido", Toast.LENGTH_LONG)
                     .show()
-                navController.navigate(Screen.StartCourseScreen.route)
+                navController.navigate(Screen.StartCourse.route)
             } else {
                 CourseReportScreen(
                     navController = navController,
@@ -61,6 +61,12 @@ fun NavigationGraph(
 
         composable(route = Screen.CoursesHistory.route) {
             CoursesHistoryScreen(
+                navController = navController
+            )
+        }
+
+        composable(route = Screen.TranslateData.route) {
+            TranslateDataScreen(
                 navController = navController
             )
         }
