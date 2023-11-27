@@ -30,11 +30,11 @@ fun StartCourseScreen(
         StartCourseButton {
             navController.navigate(Screen.FatigueDetection.route)
         }
-        Button(onClick = {
-            navController.navigate(Screen.TranslateData.route)
-        }) {
-            Text(text = "Executar rotina de tradução de dados")
-        }
+//        Button(onClick = {
+//            navController.navigate(Screen.TranslateData.route)
+//        }) {
+//            Text(text = "Executar rotina de tradução de dados")
+//        }
     }
 }
 

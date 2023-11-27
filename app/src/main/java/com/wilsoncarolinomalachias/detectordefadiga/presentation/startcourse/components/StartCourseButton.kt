@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.primaryColor
 
 @Composable
 fun StartCourseButton(
@@ -28,7 +29,7 @@ fun StartCourseButton(
                 6.dp,
                 shape = CircleShape
             )
-            .background(Color.Blue, shape = CircleShape)
+            .background(primaryColor, shape = CircleShape)
             .size(200.dp)
             .clickable {
                 onClickStartCourse()

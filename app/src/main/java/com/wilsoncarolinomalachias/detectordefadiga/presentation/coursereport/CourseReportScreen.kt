@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.primaryColor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.utils.ImageUtils
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
 
@@ -68,7 +69,7 @@ fun CourseReportScreen(
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
                 },
-                backgroundColor = Color.Blue,
+                backgroundColor = primaryColor,
                 contentColor = Color.White
             )
         },
@@ -85,7 +86,7 @@ fun CourseReportScreen(
                     )
                 },
                 text = { Text("SALVAR EM PDF") },
-                backgroundColor = Color.Blue,
+                backgroundColor = primaryColor,
                 contentColor = Color.White,
             )
         },

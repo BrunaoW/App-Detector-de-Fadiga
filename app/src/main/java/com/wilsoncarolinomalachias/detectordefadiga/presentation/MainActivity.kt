@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
@@ -21,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.BottomNav
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.primaryColor
 
 class MainActivity : ComponentActivity() {
 
@@ -28,7 +30,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val systemUiController = rememberSystemUiController()
-            systemUiController.setSystemBarsColor(color = Color.Blue)
+            systemUiController.setSystemBarsColor(
+                color = Color.White
+            )
 
             val context = LocalContext.current
 
@@ -58,6 +62,7 @@ class MainActivity : ComponentActivity() {
 
         checkCameraPermission()
         checkLocationPermission()
+        checkFineLocationPermission()
     }
 
     @Deprecated("Deprecated in Java")
@@ -98,6 +103,19 @@ class MainActivity : ComponentActivity() {
         ActivityCompat.requestPermissions(
             this,
             arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+            REQUEST_CODE_PERMISSIONS
+        )
+
+        return false
+    }
+    private fun checkFineLocationPermission(): Boolean {
+        if (ContextCompat.checkSelfPermission(baseContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
             REQUEST_CODE_PERMISSIONS
         )
 

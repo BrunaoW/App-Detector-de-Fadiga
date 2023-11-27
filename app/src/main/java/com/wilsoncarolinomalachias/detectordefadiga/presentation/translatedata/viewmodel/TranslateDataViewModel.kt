@@ -71,7 +71,6 @@ class TranslateDataViewModel: ViewModel() {
         val assetManager: AssetManager = context.assets
         val fileInputStream = assetManager.open("fadigalert-1211b01fd4ee.json")
 
-
         val credentials = GoogleCredentials
             .fromStream(fileInputStream)
             .createScoped(

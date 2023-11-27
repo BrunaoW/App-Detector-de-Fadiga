@@ -33,6 +33,7 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.components.FaceBoundsOverlay
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.viewmodels.FatigueDetectionViewModel
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.primaryColor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
 import kotlinx.coroutines.delay
 import java.util.*
@@ -59,6 +60,8 @@ fun FatigueDetectionScreen(
     val isFaceNotFound = fatigueDetectionViewModel.isCurrentlyFaceNotFound
 
     LaunchedEffect(Unit) {
+        fatigueDetectionViewModel.initializeTFLite(context)
+
         while (true) {
             delay(1.seconds)
             timeSpentInSeconds++
@@ -72,7 +75,7 @@ fun FatigueDetectionScreen(
         modifier = modifier
             .fillMaxSize()
             .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
         if (isFaceNotFound.value) {
             AlertDialog(
@@ -133,12 +136,13 @@ fun FatigueDetectionScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Fadigas detectadas:")
+            Text(text = "Ocorrências de fadiga:")
             Text(text = "${fatigueDetectionViewModel.fatigueDetectedCount}")
         }
         Button(
             modifier = Modifier
                 .fillMaxWidth()
+                .weight(1f,false)
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null
@@ -160,7 +164,7 @@ fun FatigueDetectionScreen(
                 }
             },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Blue,
+                backgroundColor = primaryColor,
                 contentColor = Color.White
             ),
             elevation = ButtonDefaults.elevation(

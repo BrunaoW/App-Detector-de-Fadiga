@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "334145687725",
+    "project_id": "fadigalert",
+    "storage_bucket": "fadigalert.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:334145687725:android:87daf6dc5c3916a4d57624",
+        "android_client_info": {
+          "package_name": "com.wilsoncarolinomalachias.detectordefadiga"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "334145687725-nca2t1hg5t05gsblom5camm47o0igr6t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wilsoncarolinomalachias.detectordefadiga",
+            "certificate_hash": "b99826fe91e494037e5817f6a1b45dcab6f9e5c6"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5BEHsPtGFbNUwhmmKTb9MVhseuh9dyFs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

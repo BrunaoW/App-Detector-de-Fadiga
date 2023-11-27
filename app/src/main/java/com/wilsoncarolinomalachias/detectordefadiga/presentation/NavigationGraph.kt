@@ -11,8 +11,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport.CourseReportScreen
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components.CoursesHistoryScreen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.CoursesHistoryScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.FatigueDetectionScreen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.login.LoginScreen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.signIn.SignInScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.startcourse.StartCourseScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.translatedata.TranslateDataScreen
 
@@ -71,10 +73,10 @@ fun NavigationGraph(
             )
         }
 
-//        composable(route = Screen.UserProfile.route) {
-//            SignInScreen(
-//                navController = navController
-//            )
-//        }
+        composable(route = Screen.Login.route) {
+            LoginScreen(
+                navController = navController
+            )
+        }
     }
 }

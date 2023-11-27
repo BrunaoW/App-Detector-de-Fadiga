@@ -11,6 +11,7 @@ import android.media.RingtoneManager
 import android.os.CountDownTimer
 import android.util.Log
 import android.util.Size
+import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -22,20 +23,28 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tflite.client.TfLiteInitializationOptions
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
-import com.google.mlkit.vision.face.FaceContour
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.entities.Course
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.executor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.utils.getCameraProvider
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.translatedata.viewmodel.CustomFace
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.task.gms.vision.TfLiteVision
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.*
 
 class FatigueDetectionViewModel : ViewModel() {
+
+    private lateinit var trainedModelInterpreter: Interpreter
+    private var fatigueProbability: Float = 0f
 
     var fatigueDetectedCount: Int = 0
 
@@ -58,13 +67,25 @@ class FatigueDetectionViewModel : ViewModel() {
     lateinit var previewUseCase: Preview
     lateinit var imageAnalysis: ImageAnalysis
 
-    private var leftEyeClosedProbability: Float = 0f
-    private var rightEyeClosedProbability: Float = 0f
-
-    private var isEyesCurrentlyClosed: Boolean = false
-
     var isCurrentlyFaceNotFound = mutableStateOf(false)
         private set
+
+    private val fatigueOccuringTimer = object : CountDownTimer(5_000, 1_000) {
+        var tempoExcedido = false
+
+        override fun onTick(millisUntilFinished: Long) {
+            if (fatigueProbability > 0.8) {
+                tempoExcedido = true
+            } else {
+                tempoExcedido = false
+                cancel() // Se a probabilidade for menor, interrompe o timer
+            }
+        }
+
+        override fun onFinish() {
+            notifyFatigue()
+        }
+    }
 
     private val faceNotFoundTimer = object : CountDownTimer(10_000, 10_000) {
         var isCountingTime: Boolean = false
@@ -72,37 +93,7 @@ class FatigueDetectionViewModel : ViewModel() {
         override fun onTick(millisUntilFinished: Long) { }
 
         override fun onFinish() {
-            ringtoneManager.play()
             isCurrentlyFaceNotFound.value = true
-        }
-    }
-
-    private val yawnTimer = object : CountDownTimer(6000, 6000) {
-        var isCountingTime: Boolean = false
-
-        override fun onTick(millisUntilFinished: Long) { }
-
-        override fun onFinish() {
-            isCountingTime = false
-
-            if (isEyesCurrentlyClosed) {
-                isYawnOccuring = true
-                notifyFatigue()
-            }
-        }
-    }
-
-    private val closedEyesTimer = object : CountDownTimer(1_500, 1_500) {
-        var isCountingTime: Boolean = false
-
-        override fun onTick(millisUntilFinished: Long) { }
-
-        override fun onFinish() {
-            isCountingTime = false
-
-            if (isEyesCurrentlyClosed) {
-                notifyFatigue()
-            }
         }
     }
 
@@ -118,7 +109,6 @@ class FatigueDetectionViewModel : ViewModel() {
         }
     }
 
-    private var isYawnOccuring: Boolean = false
     private val yawnAndTimeOccured: MutableList<Long> = mutableListOf()
 
     private fun notifyFatigue() {
@@ -165,7 +155,6 @@ class FatigueDetectionViewModel : ViewModel() {
         imageAnalysis.setAnalyzer(executor) { imageProxy ->
             val rotationDegrees = imageProxy.imageInfo.rotationDegrees
             val image = imageProxy.image
-            val routineTimeStart = Date()
 
             if (image != null) {
                 val processImage = InputImage.fromMediaImage(image, rotationDegrees)
@@ -191,7 +180,7 @@ class FatigueDetectionViewModel : ViewModel() {
                             }
 
                             processImageCallback(allPoints)
-                            processFaceFeaturesAndDetectFatigue(face, routineTimeStart)
+                            processFaceFeaturesAndDetectFatigue(face)
                         }
 
                         imageProxy.close()
@@ -208,78 +197,48 @@ class FatigueDetectionViewModel : ViewModel() {
         ringtoneManager.stop()
     }
 
-    private fun processFaceFeaturesAndDetectFatigue(face: Face, routineTimeStart: Date) {
-        detectEyesClosedForTooLong(face)
-        detectMultipleYawnsInShortSpan(face)
-    }
+    private fun processFaceFeaturesAndDetectFatigue(face: Face) {
+        if (!this::trainedModelInterpreter.isInitialized)
+            return
 
-    private fun detectMultipleYawnsInShortSpan(face: Face) {
-        // Detectar se boca abriu
-        val upperLipBottom = face.getContour(FaceContour.UPPER_LIP_BOTTOM)
-        val lowerLipTop = face.getContour(FaceContour.LOWER_LIP_TOP)
+        val customFace = CustomFace("", face)
+        val allFacePoints = customFace.allPoints
 
-        val uppperLipBottomPositionSum = upperLipBottom?.points?.fold(0f) { acc, point ->
-            return@fold acc + point.x + point.y
-        } ?: 0f
+        if (allFacePoints.isEmpty())
+            return
 
-        val lowerLipTopPositionSum = lowerLipTop?.points?.fold(0f) { acc, point ->
-            return@fold acc + point.x + point.y
-        } ?: 0f
+        val qtdPoints = allFacePoints.size
+        val classificationInputData = FloatArray(268) {index ->
+            // Calculo o indice pro ponto atual a fim de não exceder os limites do vetor que tem
+            // um tamanho menor que `qtdPoints`
+            val currentPoint = allFacePoints[index % (qtdPoints - 1)]
 
-        val sumPercentDiff = uppperLipBottomPositionSum / lowerLipTopPositionSum
-        val actualTime = Date()
-
-
-        if (sumPercentDiff < 0.99 && !isYawnOccuring) {
-            if (!yawnTimer.isCountingTime) {
-                yawnTimer.start()
-                yawnTimer.isCountingTime = true
-                yawnAndTimeOccured.add(actualTime.time)
-            } else {
-                yawnTimer.cancel()
-                yawnTimer.isCountingTime = false
-            }
-        } else {
-            isYawnOccuring = false
+            if (index < qtdPoints)
+                return@FloatArray currentPoint.x
+            else if (index < qtdPoints * 2)
+                return@FloatArray currentPoint.y
+            else if (index == 266)
+                return@FloatArray customFace.leftEyePerClos
+            else
+                return@FloatArray customFace.rightEyePerClos
         }
 
-        // Fazer uma contagem de bocejos:
-        // Caso tenha bocejado 2 vezes em um tempo de 1 minuto, enviar evento de fadiga
-//        if (sumPercentDiff < 0.99 && isEyesCurrentlyClosed && !isYawnOccuring) {
-//            isYawnOccuring = true
-//            yawnAndTimeOccured.add(actualTime.time)
-//        } else if (sumPercentDiff >= 0.99 || !isEyesCurrentlyClosed) {
-//            isYawnOccuring = false
-//        }
-//
-//        val yawnsHappenedInLastMinute = yawnAndTimeOccured.count {
-//            (it - actualTime.time) < 60
-//        }
+        val classificationInputBuffer = ByteBuffer
+            .allocateDirect(classificationInputData.size * 4)
+            .order(ByteOrder.nativeOrder())
+        classificationInputBuffer.rewind()
+        classificationInputBuffer.asFloatBuffer().put(classificationInputData)
 
+        val outputTensorSize = trainedModelInterpreter
+            .getOutputTensor(0).numBytes()
 
-    }
+        val outputBuffer = ByteBuffer
+            .allocateDirect(outputTensorSize)
+            .order(ByteOrder.nativeOrder())
 
-    private fun detectEyesClosedForTooLong(face: Face) {
-        // usar o dado "eyeClosedProbability"
-        rightEyeClosedProbability = 1 - (face.rightEyeOpenProbability ?: 1f)
-        leftEyeClosedProbability = 1 - (face.leftEyeOpenProbability ?: 1f)
+        trainedModelInterpreter.run(classificationInputBuffer, outputBuffer)
 
-        // Se ele ficou abaixo de uma dada porcentagem (90%) durante 2 segundos, enviar evento de fadiga
-        val isEyesClosedInLastTick = isEyesCurrentlyClosed
-        isEyesCurrentlyClosed = rightEyeClosedProbability > 0.9 && leftEyeClosedProbability > 0.9
-
-        if (isEyesClosedInLastTick) {
-            if (isEyesCurrentlyClosed) {
-                if (closedEyesTimer.isCountingTime)
-                    return
-
-                closedEyesTimer.start()
-                closedEyesTimer.isCountingTime = true
-            } else {
-                closedEyesTimer.cancel()
-                closedEyesTimer.isCountingTime = false
-            }
-        }
+        val fatigueProbability = outputBuffer.getFloat(0)
     }
 
     fun setCameraProvider(lifecycleOwner: LifecycleOwner, context: Context) {
@@ -344,7 +303,7 @@ class FatigueDetectionViewModel : ViewModel() {
                 startAddress = startAddress,
                 destinationAddress = finalAddress,
                 eventsWithTimeList = ArrayList(eventWithTimeList),
-                fatigueCount = fatigueDetectedCount
+                fatigueCount = fatigueDetectedCount.toInt()
             )
 
             onCompletion(course)
@@ -395,5 +354,41 @@ class FatigueDetectionViewModel : ViewModel() {
                 delay(60_000)
             }
         }
+    }
+
+    fun initializeTFLite(context: Context) {
+        val options = TfLiteInitializationOptions.builder()
+            .setEnableGpuDelegateSupport(true)
+            .build()
+
+        val tfliteModel = loadModelFileFromAssets(context, "model.tflite")
+
+        TfLiteVision.initialize(context, options).addOnSuccessListener {
+            trainedModelInterpreter = Interpreter(tfliteModel)
+        }.addOnFailureListener {
+            TfLiteVision.initialize(context).addOnSuccessListener {
+                trainedModelInterpreter = Interpreter(tfliteModel)
+            }.addOnFailureListener{
+                Toast.makeText(context, "O detector TFLite falhou", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun loadModelFileFromAssets(context: Context, modelName: String): ByteBuffer {
+        val assetManager = context.assets
+        val inputStream = assetManager.open(modelName)
+        val fileSize = inputStream.available()
+        val buffer = ByteBuffer.allocateDirect(fileSize)
+
+        inputStream.use { input ->
+            buffer.apply {
+                val bytes = ByteArray(buffer.capacity())
+                input.read(bytes)
+                buffer.put(bytes)
+                buffer.rewind() // Volta para o início do buffer
+            }
+        }
+
+        return buffer
     }
 }

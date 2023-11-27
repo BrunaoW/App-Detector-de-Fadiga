@@ -1,4 +1,4 @@
-package com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components
+package com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,7 +18,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components.CourseCardGreen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components.CourseCardOrange
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.components.SearchAppBar
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.primaryColor
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.viewmodels.CourseViewModel
 
 
@@ -48,7 +52,7 @@ fun CoursesHistoryScreen(
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
                 },
-                backgroundColor = Color.Blue,
+                backgroundColor = primaryColor,
                 contentColor = Color.White
             )
         },

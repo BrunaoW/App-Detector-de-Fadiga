@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.DetectorDeFadigaTheme
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.primaryColor
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -46,7 +47,7 @@ fun ReportCard(
                 Text(
                     text = "Corrida ${if (hasFatigue) "(Fadiga detectada)" else ""}",
                     fontSize = 20.sp,
-                    color = if (hasFatigue) brownColor else Color.Blue
+                    color = if (hasFatigue) brownColor else primaryColor
                 )
 
                 Text(
