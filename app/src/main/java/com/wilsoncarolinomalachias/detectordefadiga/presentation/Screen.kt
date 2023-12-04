@@ -10,6 +10,7 @@ sealed class Screen(val route: String, val iconResourceId: Int? = null) {
     object UserProfile: Screen("user_profile_screen", R.drawable.ic_profile)
     object TranslateData: Screen("translate_data", R.drawable.ic_directions_car)
     object Login: Screen("login", R.drawable.ic_profile)
+    object Signup: Screen("signup", R.drawable.ic_profile)
 
     companion object {
         fun getAllScreens(): List<Screen> {
@@ -20,7 +21,8 @@ sealed class Screen(val route: String, val iconResourceId: Int? = null) {
                 CoursesHistory,
                 UserProfile,
                 TranslateData,
-                Login
+                Login,
+                Signup
             )
         }
     }

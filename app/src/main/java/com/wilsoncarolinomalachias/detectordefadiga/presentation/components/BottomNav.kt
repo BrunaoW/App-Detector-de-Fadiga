@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.AppAuthentication
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.Screen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.primaryColor
 
@@ -21,7 +22,7 @@ fun BottomNav(
     val mainNavigationScreenList = listOf(
         Screen.StartCourse,
         Screen.CoursesHistory,
-        Screen.Login
+        if (AppAuthentication.isUserLoggedIn()) Screen.UserProfile else Screen.Login
     )
 
     BottomNavigation(

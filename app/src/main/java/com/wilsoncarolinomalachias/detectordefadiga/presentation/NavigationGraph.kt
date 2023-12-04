@@ -14,9 +14,10 @@ import com.wilsoncarolinomalachias.detectordefadiga.presentation.coursereport.Co
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.courseshistory.CoursesHistoryScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.fatiguedetection.FatigueDetectionScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.login.LoginScreen
-import com.wilsoncarolinomalachias.detectordefadiga.presentation.signIn.SignInScreen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.signUp.SignUpScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.startcourse.StartCourseScreen
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.translatedata.TranslateDataScreen
+import com.wilsoncarolinomalachias.detectordefadiga.presentation.userprofile.UserProfileScreen
 
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
@@ -75,6 +76,18 @@ fun NavigationGraph(
 
         composable(route = Screen.Login.route) {
             LoginScreen(
+                navController = navController
+            )
+        }
+
+        composable(route = Screen.Signup.route) {
+            SignUpScreen(
+                navController = navController
+            )
+        }
+
+        composable(route = Screen.UserProfile.route) {
+            UserProfileScreen(
                 navController = navController
             )
         }

@@ -69,7 +69,7 @@ class TranslateDataViewModel: ViewModel() {
 
     fun obterTokenDeAcesso(context: Context) {
         val assetManager: AssetManager = context.assets
-        val fileInputStream = assetManager.open("fadigalert-1211b01fd4ee.json")
+        val fileInputStream = assetManager.open("fadigalert-7a0e2585c44e.json")
 
         val credentials = GoogleCredentials
             .fromStream(fileInputStream)
@@ -135,7 +135,7 @@ class TranslateDataViewModel: ViewModel() {
                     nextPageToken = parsedJson["nextPageToken"]?.jsonPrimitive?.content
                     i++
                 }
-            } while(nextPageToken != null && (i * 100) <= 1000)
+            } while(nextPageToken != null && (i * 100) <= 100)
         }
     }
 
@@ -204,7 +204,7 @@ class TranslateDataViewModel: ViewModel() {
         var i = 0
 
         for (file in googleDriveList) {
-            if (i > 1000)
+            if (i > 20)
                 break
 
             try {

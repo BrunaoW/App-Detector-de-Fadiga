@@ -1,4 +1,4 @@
-package com.wilsoncarolinomalachias.detectordefadiga.presentation.login.components
+package com.wilsoncarolinomalachias.detectordefadiga.presentation.components
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,19 +20,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import com.wilsoncarolinomalachias.detectordefadiga.presentation.ui.theme.primaryColor
 
 @Composable
 fun PasswordField(
-    value: String,
+    modifier: Modifier = Modifier,
     onChange: (String) -> Unit,
     submit: () -> Unit,
-    modifier: Modifier = Modifier,
     label: String = "Password",
     placeholder: String = "Enter your Password"
 ) {
-
+    var value by remember { mutableStateOf(TextFieldValue("")) }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
     val leadingIcon = @Composable {
@@ -55,7 +55,10 @@ fun PasswordField(
 
     TextField(
         value = value,
-        onValueChange = onChange,
+        onValueChange = { newValue ->
+            value = newValue
+            onChange(newValue.text)
+        },
         modifier = modifier,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,

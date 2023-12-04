@@ -44,7 +44,7 @@ import java.util.*
 class FatigueDetectionViewModel : ViewModel() {
 
     private lateinit var trainedModelInterpreter: Interpreter
-    private var fatigueProbability: Float = 0f
+    var fatigueProbability: Float = 0f
 
     var fatigueDetectedCount: Int = 0
 
@@ -238,7 +238,7 @@ class FatigueDetectionViewModel : ViewModel() {
 
         trainedModelInterpreter.run(classificationInputBuffer, outputBuffer)
 
-        val fatigueProbability = outputBuffer.getFloat(0)
+        fatigueProbability = outputBuffer.getFloat(0)
     }
 
     fun setCameraProvider(lifecycleOwner: LifecycleOwner, context: Context) {
